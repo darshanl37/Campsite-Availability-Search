@@ -25,7 +25,7 @@ from flask_wtf.csrf import CSRFProtect
 load_dotenv()
 
 # Import our models and services
-from website.models import db, User, Subscription, Notification, Payment, VerificationCode, SearchHistory
+from website.models import db, User, Subscription, Notification, Payment, VerificationCode, SearchHistory, Campground
 from website.routes import register_routes
 from website.services import auth_service
 
@@ -85,6 +85,26 @@ init_scheduler(DATABASE_URI)
 with app.app_context():
     from website.services.subscription_service import SubscriptionService
     SubscriptionService.restore_active_watches()
+
+# Schedule weekly campground sync
+# Reference the function via its stable module path so APScheduler can always
+# resolve the stored reference, regardless of how Flask is loaded.
+from website.scheduler import get_scheduler
+_sched = get_scheduler()
+if _sched:
+    try:
+        from website.services.campground_sync import run_scheduled_sync
+        _sched.add_job(
+            run_scheduled_sync,
+            'interval',
+            weeks=1,
+            id='campground_weekly_sync',
+            name='Weekly campground data sync',
+            replace_existing=True,
+        )
+        app.logger.info("Scheduled weekly campground sync job")
+    except Exception as _e:
+        app.logger.warning(f"Could not schedule campground sync: {_e}")
 
 # Configure logging with timestamp
 LOG_DIR = 'logs'
@@ -158,6 +178,45 @@ def results():
 def about():
     user = auth_service.get_current_user()
     return render_template('about.html', MAPS_API_KEY=MAPS_API_KEY, user=user)
+
+@app.route('/campground/<provider>/<external_id>')
+def campground_profile(provider, external_id):
+    """Campground profile page with on-demand sync."""
+    if provider not in ('rg', 'rc'):
+        from flask import abort
+        abort(404)
+
+    campground = Campground.query.filter_by(provider=provider, external_id=external_id).first()
+
+    # On-demand sync if not in DB, stale (>7 days), or missing enrichment data
+    needs_sync = (
+        not campground
+        or not campground.last_synced
+        or (datetime.utcnow() - campground.last_synced).days > 7
+        or (campground.provider == 'rc' and not campground.photos)
+    )
+    if needs_sync:
+        from website.services.campground_sync import sync_one
+        sync_one(provider, external_id)
+        campground = Campground.query.filter_by(provider=provider, external_id=external_id).first()
+
+    if not campground:
+        from flask import abort
+        abort(404)
+
+    user = auth_service.get_current_user()
+    return render_template('campground/profile.html', cg=campground, user=user)
+
+
+@app.route('/campground/<slug>')
+def campground_profile_by_slug(slug):
+    """SEO-friendly campground profile URL."""
+    campground = Campground.query.filter_by(slug=slug).first()
+    if not campground:
+        from flask import abort
+        abort(404)
+    return redirect(url_for('campground_profile', provider=campground.provider, external_id=campground.external_id))
+
 
 @app.route('/history')
 def history():
@@ -522,6 +581,7 @@ def _fetch_ridb_facilities(lat, lng, radius=100, max_results=500):
 
 
 @app.route('/search_campsites', methods=['POST'])
+@csrf.exempt
 @limiter.limit("20 per minute")
 def search_campsites():
     try:
@@ -599,6 +659,25 @@ def search_campsites():
                 'phone': site.get('FacilityPhone', ''),
             })
 
+        # Enrich RC results with photos/descriptions from DB
+        rc_ext_ids = [r['id'].replace('rc:', '') for r in rc_results]
+        rc_db_map = {}
+        if rc_ext_ids:
+            rc_records = Campground.query.filter(
+                Campground.provider == 'rc',
+                Campground.external_id.in_(rc_ext_ids)
+            ).all()
+            rc_db_map = {cg.external_id: cg for cg in rc_records}
+
+        for site in rc_results:
+            ext_id = site['id'].replace('rc:', '')
+            cg = rc_db_map.get(ext_id)
+            if cg:
+                if not site.get('image_url') and cg.photos:
+                    site['image_url'] = cg.primary_photo or ''
+                if (not site.get('description') or len(site.get('description', '')) < 50) and cg.description_overview:
+                    site['description'] = cg.description_overview
+
         # RC results already have the right shape (with rc: prefix and provider field)
         all_campsites = rg_campsites + rc_results
 
@@ -631,6 +710,7 @@ def search_campsites():
 
 
 @app.route('/search_campsites_by_name', methods=['POST'])
+@csrf.exempt
 @limiter.limit("20 per minute")
 def search_campsites_by_name():
     """Search campgrounds by name across RIDB and ReserveCalifornia."""
@@ -700,6 +780,23 @@ def search_campsites_by_name():
             rc_results = search_rc_campgrounds_by_name(query)
         except Exception as e:
             logger.error(f"RC name search error: {e}")
+
+        # Enrich RC results with photos/descriptions from DB
+        rc_ext_ids = [r['id'].replace('rc:', '') for r in rc_results]
+        if rc_ext_ids:
+            rc_records = Campground.query.filter(
+                Campground.provider == 'rc',
+                Campground.external_id.in_(rc_ext_ids)
+            ).all()
+            rc_db_map = {cg.external_id: cg for cg in rc_records}
+            for site in rc_results:
+                ext_id = site['id'].replace('rc:', '')
+                cg = rc_db_map.get(ext_id)
+                if cg:
+                    if not site.get('image_url') and cg.photos:
+                        site['image_url'] = cg.primary_photo or ''
+                    if (not site.get('description') or len(site.get('description', '')) < 50) and cg.description_overview:
+                        site['description'] = cg.description_overview
 
         return jsonify({
             'success': True,

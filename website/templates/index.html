@@ -77,7 +77,8 @@
             searchForm.addEventListener('submit', function(e) {
                     e.preventDefault();
 
-                // Show loading spinner with dynamic message
+                // Clear previous results and show loading spinner
+                resultsContainer.innerHTML = '';
                 loadingSpinner.style.display = 'block';
 
                 // Get form data first to determine campground count
@@ -86,18 +87,15 @@
 
                 // Update loading message based on number of campgrounds
                 const loadingMessageEl = document.querySelector('#loading-spinner .loading-message');
-                if (parkIds.length > 10) {
-                    const batches = Math.ceil(parkIds.length / 5);
-                    loadingMessageEl.textContent = `Searching ${parkIds.length} campgrounds in ${batches} batches... This may take ${batches * 2}-${batches * 2 + 2} minutes.`;
-                } else if (parkIds.length > 1) {
-                    loadingMessageEl.textContent = `Searching ${parkIds.length} campgrounds... This takes 30-60 seconds.`;
+                if (parkIds.length > 1) {
+                    loadingMessageEl.textContent = `Searching ${parkIds.length} campgrounds...`;
                 } else {
-                    loadingMessageEl.textContent = 'Searching Recreation.gov... This takes 10-30 seconds.';
+                    loadingMessageEl.textContent = 'Searching Recreation.gov...';
                 }
 
-                // Open bottom sheet to full on mobile, scroll on desktop
+                // Open bottom sheet to full on mobile, scroll to loading spinner on desktop
                 if (window.openBottomSheet) window.openBottomSheet('full');
-                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+                loadingSpinner.scrollIntoView({ behavior: 'smooth' });
 
                 const searchParams = new URLSearchParams();
 
@@ -195,10 +193,8 @@
 
                 // Info message for large searches
                 if (parkIds.length > 10) {
-                    const estimatedTime = Math.ceil(parkIds.length / 5) * 2; // ~2 min per batch of 5
                     alert(
                         `Searching ${parkIds.length} campgrounds...\n\n` +
-                        `This will run in batches and take approximately ${estimatedTime}-${estimatedTime + 2} minutes.\n\n` +
                         `Please be patient and don't close this tab.`
                     );
                 }
@@ -371,13 +367,13 @@
                                     <input type="radio" id="flexibleWeekend" name="searchPreference" value="flexible">
                                     <i class="fas fa-calendar-week"></i>
                                     <span class="pill-label">Thu - Mon</span>
-                                    <span class="pill-subtitle">Flexible</span>
+                                    <span class="pill-subtitle">Near Weekend</span>
                                 </label>
                                 <label class="preference-pill active" data-value="all">
                                     <input type="radio" id="allDates" name="searchPreference" value="all" checked>
                                     <i class="fas fa-calendar"></i>
                                     <span class="pill-label">Any Day</span>
-                                    <span class="pill-subtitle">All Days</span>
+                                    <span class="pill-subtitle">All Dates</span>
                                 </label>
                             </div>
                         </div>
@@ -389,7 +385,6 @@
                 <div id="loading-spinner" class="loading-spinner">
                     <i class="fas fa-spinner"></i>
                     <div class="loading-message">Searching Recreation.gov...</div>
-                    <div class="loading-submessage">This typically takes 10-30 seconds</div>
                     <div class="loading-tip">Tip: We're checking thousands of dates for you</div>
                 </div>
 

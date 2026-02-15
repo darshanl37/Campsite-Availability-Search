@@ -28,7 +28,7 @@ RC_AVAILABILITY_URL = f"{RC_BASE_URL}/rdr/search/grid"
 RC_DATE_FMT = "%m-%d-%Y"
 
 RC_CAMPGROUND_URL = "https://www.reservecalifornia.com"
-RC_BOOKING_PATH = "Web/Default.aspx#!park/{place_id}/{facility_id}"
+RC_BOOKING_PATH = ""
 
 # ── In-memory metadata cache (places + facilities) ────────────────────
 _cache = {
@@ -191,7 +191,7 @@ def discover_rc_campgrounds(lat, lng, radius_miles=100):
             "type": "Campground",
             "provider": "ReserveCalifornia",
             "image_url": "",
-            "booking_url": f"https://www.reservecalifornia.com/Web/Default.aspx#!park/{place_id_val}/{fac_id}",
+            "booking_url": "https://www.reservecalifornia.com",
         })
 
     logger.info(f"RC discovery: {len(results)} campgrounds within {radius_miles} mi of ({lat},{lng})")
@@ -232,7 +232,7 @@ def search_rc_campgrounds_by_name(query):
                 "type": "Campground",
                 "provider": "ReserveCalifornia",
                 "image_url": "",
-                "booking_url": f"https://www.reservecalifornia.com/Web/Default.aspx#!park/{place_id_val}/{fac_id}",
+                "booking_url": "https://www.reservecalifornia.com",
             })
 
     return results

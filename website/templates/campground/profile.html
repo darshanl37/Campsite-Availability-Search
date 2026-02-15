@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ cg.name }} - CampFinder</title>
+    <meta name="description" content="{{ cg.description_overview|striptags|truncate(160) if cg.description_overview else cg.name ~ ' campground profile on CampFinder' }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="page-profile">
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/">
+                    <i class="fas fa-campground"></i>
+                    <span>CampFinder</span>
+                </a>
+                <span class="nav-tagline">Find available campsites</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/history" class="nav-link">History</a>
+                <a href="/about" class="nav-link">About</a>
+                {% if current_user is defined and current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.profile') }}" class="nav-link"><i class="fas fa-user-circle"></i></a>
+                    <a href="{{ url_for('auth.logout') }}" class="nav-link"><i class="fas fa-sign-out-alt"></i></a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="nav-link"><i class="fas fa-sign-in-alt"></i></a>
+                    <a href="{{ url_for('auth.signup') }}" class="nav-link"><i class="fas fa-user-plus"></i></a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <div class="profile-hero" {% if cg.primary_photo %}style="background-image: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55)), url('{{ cg.primary_photo }}')"{% endif %}>
+            <div class="profile-hero-content">
+                <div class="profile-hero-badges">
+                    {% if cg.provider == 'rg' %}
+                        <span class="facility-type-badge campground">Recreation.gov</span>
+                    {% else %}
+                        <span class="facility-type-badge rc">CA State Parks</span>
+                    {% endif %}
+                    {% if cg.facility_type and cg.facility_type != 'Campground' and not cg.facility_type.isdigit() %}
+                        <span class="facility-type-badge cabin">{{ cg.facility_type }}</span>
+                    {% endif %}
+                </div>
+                <h1 class="profile-hero-title">{{ cg.name }}</h1>
+                {% if cg.city or cg.state %}
+                    <p class="profile-hero-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ cg.city }}{% if cg.city and cg.state %}, {% endif %}{{ cg.state }}
+                    </p>
+                {% endif %}
+                <div class="profile-hero-actions">
+                    {% if cg.booking_url %}
+                        <a href="{{ cg.booking_url }}" target="_blank" rel="noopener" class="profile-btn profile-btn-primary">
+                            <i class="fas fa-calendar-check"></i> Book on {{ 'reservecalifornia.com' if cg.provider == 'rc' else 'recreation.gov' }}
+                        </a>
+                    {% endif %}
+                    {% if cg.latitude and cg.longitude %}
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ cg.latitude }},{{ cg.longitude }}" target="_blank" rel="noopener" class="profile-btn profile-btn-secondary">
+                            <i class="fas fa-directions"></i> Get Directions
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Facts -->
+        {% if cg.total_sites or cg.max_vehicle_length or cg.pets_allowed is not none or cg.campfires_allowed is not none %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Quick Facts</h2>
+            <div class="profile-facts-grid">
+                {% if cg.total_sites %}
+                <div class="profile-fact">
+                    <div class="profile-fact-icon"><i class="fas fa-campground"></i></div>
+                    <div class="profile-fact-value">{{ cg.total_sites }}</div>
+                    <div class="profile-fact-label">Sites</div>
+                </div>
+                {% endif %}
+                {% if cg.max_vehicle_length %}
+                <div class="profile-fact">
+                    <div class="profile-fact-icon"><i class="fas fa-truck-pickup"></i></div>
+                    <div class="profile-fact-value">{{ cg.max_vehicle_length }}ft</div>
+                    <div class="profile-fact-label">Max Vehicle</div>
+                </div>
+                {% endif %}
+                {% if cg.pets_allowed is not none %}
+                <div class="profile-fact">
+                    <div class="profile-fact-icon"><i class="fas fa-paw"></i></div>
+                    <div class="profile-fact-value">{{ 'Yes' if cg.pets_allowed else 'No' }}</div>
+                    <div class="profile-fact-label">Pets</div>
+                </div>
+                {% endif %}
+                {% if cg.campfires_allowed is not none %}
+                <div class="profile-fact">
+                    <div class="profile-fact-icon"><i class="fas fa-fire"></i></div>
+                    <div class="profile-fact-value">{{ 'Yes' if cg.campfires_allowed else 'No' }}</div>
+                    <div class="profile-fact-label">Campfires</div>
+                </div>
+                {% endif %}
+                {% if cg.ada_access %}
+                <div class="profile-fact">
+                    <div class="profile-fact-icon"><i class="fas fa-wheelchair"></i></div>
+                    <div class="profile-fact-value">Yes</div>
+                    <div class="profile-fact-label">ADA Access</div>
+                </div>
+                {% endif %}
+                {% if cg.shade_available is not none %}
+                <div class="profile-fact">
+                    <div class="profile-fact-icon"><i class="fas fa-tree"></i></div>
+                    <div class="profile-fact-value">{{ 'Yes' if cg.shade_available else 'No' }}</div>
+                    <div class="profile-fact-label">Shade</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-details-row">
+                {% if cg.checkin_time %}
+                    <span class="profile-detail"><i class="fas fa-sign-in-alt"></i> Check-in: {{ cg.checkin_time }}</span>
+                {% endif %}
+                {% if cg.checkout_time %}
+                    <span class="profile-detail"><i class="fas fa-sign-out-alt"></i> Checkout: {{ cg.checkout_time }}</span>
+                {% endif %}
+                {% if cg.max_people_per_site %}
+                    <span class="profile-detail"><i class="fas fa-users"></i> Max {{ cg.max_people_per_site }} people</span>
+                {% endif %}
+                {% if cg.max_vehicles_per_site %}
+                    <span class="profile-detail"><i class="fas fa-car"></i> {{ cg.max_vehicles_per_site }} vehicle{{ 's' if cg.max_vehicles_per_site > 1 else '' }}</span>
+                {% endif %}
+                {% if cg.stay_limit %}
+                    <span class="profile-detail"><i class="fas fa-clock"></i> Stay limit: {{ cg.stay_limit }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Photo Gallery -->
+        {% if cg.photos and cg.photos|length > 1 %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Photos</h2>
+            <div class="profile-gallery">
+                {% for photo in cg.photos[:20] %}
+                <div class="profile-gallery-item">
+                    <img src="{{ photo.url }}" alt="{{ photo.title or cg.name }}" loading="lazy">
+                    {% if photo.title %}
+                        <span class="profile-gallery-caption">{{ photo.title }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Overview -->
+        {% if cg.description_overview %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Overview</h2>
+            <div class="profile-text-content">{{ cg.description_overview|safe }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Facilities & Amenities -->
+        {% if cg.description_facilities %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Facilities & Amenities</h2>
+            <div class="profile-text-content">{{ cg.description_facilities|safe }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Recreation -->
+        {% if cg.description_recreation %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Recreation</h2>
+            <div class="profile-text-content">{{ cg.description_recreation|safe }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Natural Features -->
+        {% if cg.description_natural_features %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Natural Features</h2>
+            <div class="profile-text-content">{{ cg.description_natural_features|safe }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Site Types -->
+        {% if cg.site_types or cg.permitted_equipment or cg.driveway_surface %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Site Types & Equipment</h2>
+            {% if cg.site_types %}
+            <div class="profile-site-types">
+                {% for type_name, count in cg.site_types.items() %}
+                    <span class="profile-site-type-chip">{{ type_name }} ({{ count }})</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if cg.permitted_equipment %}
+            <div class="profile-equipment">
+                <h3>Permitted Equipment</h3>
+                <div class="profile-equipment-list">
+                    {% for eq in cg.permitted_equipment %}
+                        <span class="profile-equipment-item">
+                            {{ eq.name }}{% if eq.maxLength %} (max {{ eq.maxLength }}ft){% endif %}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% if cg.driveway_surface %}
+            <p class="profile-detail-text"><strong>Driveway surface:</strong> {{ cg.driveway_surface }}</p>
+            {% endif %}
+            {% if cg.loops %}
+            <div class="profile-loops">
+                <h3>Loops</h3>
+                <div class="profile-loops-list">
+                    {% for loop_name in cg.loops %}
+                        <span class="profile-loop-chip">{{ loop_name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Directions -->
+        {% if cg.directions %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Directions</h2>
+            <div class="profile-text-content">{{ cg.directions|safe }}</div>
+            {% if cg.latitude and cg.longitude %}
+            <a href="https://www.google.com/maps/dir/?api=1&destination={{ cg.latitude }},{{ cg.longitude }}" target="_blank" rel="noopener" class="profile-directions-link">
+                <i class="fas fa-map-marked-alt"></i> Open in Google Maps
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Rules & Policies -->
+        {% if cg.description_rules %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Rules & Policies</h2>
+            <div class="profile-text-content">{{ cg.description_rules|safe }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Nearby Attractions -->
+        {% if cg.description_nearby %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Nearby Attractions</h2>
+            <div class="profile-text-content">{{ cg.description_nearby|safe }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Contact -->
+        {% if cg.phone or cg.email or cg.booking_url %}
+        <div class="profile-section">
+            <h2 class="profile-section-title">Contact</h2>
+            <div class="profile-contact">
+                {% if cg.phone %}
+                    <a href="tel:{{ cg.phone }}" class="profile-contact-item">
+                        <i class="fas fa-phone"></i> {{ cg.phone }}
+                    </a>
+                {% endif %}
+                {% if cg.email %}
+                    <a href="mailto:{{ cg.email }}" class="profile-contact-item">
+                        <i class="fas fa-envelope"></i> {{ cg.email }}
+                    </a>
+                {% endif %}
+                {% if cg.booking_url %}
+                    <a href="{{ cg.booking_url }}" target="_blank" rel="noopener" class="profile-contact-item">
+                        <i class="fas fa-external-link-alt"></i>
+                        Book on {{ 'reservecalifornia.com' if cg.provider == 'rc' else 'recreation.gov' }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Last synced info -->
+        {% if cg.last_synced %}
+        <p class="profile-sync-info">
+            Last updated: {{ cg.last_synced.strftime('%b %d, %Y') }}
+        </p>
+        {% endif %}
+    </main>
+</body>
+</html>

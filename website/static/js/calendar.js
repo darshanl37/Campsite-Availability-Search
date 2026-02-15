@@ -65,7 +65,7 @@ class CalendarGrid {
   _bookingUrl(checkin, checkout) {
     const rawId = this.parkId.replace(/^(rc:|rg:)/, '');
     if (this.provider === 'ReserveCalifornia' || this.parkId.startsWith('rc:')) {
-      return `https://www.reservecalifornia.com/Web/Default.aspx#!park/0/${rawId}`;
+      return 'https://www.reservecalifornia.com';
     }
     return `https://www.recreation.gov/camping/campgrounds/${rawId}?start=${checkin}&end=${checkout}`;
   }
@@ -73,7 +73,7 @@ class CalendarGrid {
   _headerUrl() {
     const rawId = this.parkId.replace(/^(rc:|rg:)/, '');
     if (this.provider === 'ReserveCalifornia' || this.parkId.startsWith('rc:')) {
-      return `https://www.reservecalifornia.com/Web/Default.aspx#!park/0/${rawId}`;
+      return 'https://www.reservecalifornia.com';
     }
     return `https://www.recreation.gov/camping/campgrounds/${rawId}`;
   }
@@ -192,12 +192,22 @@ class CalendarGrid {
 }
 
 /**
+ * Format a YYYY-MM-DD date string as "Fri, Aug 15".
+ */
+function _fmtReadable(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
+}
+
+/**
  * Map availability type to display labels.
  */
 const TYPE_LABELS = {
   priority: 'Weekend',
-  regular:  'Flexible',
-  ignored:  'Weekday',
+  regular:  'Near Weekend',
+  ignored:  'Midweek',
 };
 
 /**
@@ -217,7 +227,7 @@ function getAllowedTypes(searchPreference) {
 function getBookingUrl(parkId, provider, checkin, checkout) {
   const rawId = parkId.replace(/^(rc:|rg:)/, '');
   if (provider === 'ReserveCalifornia' || parkId.startsWith('rc:')) {
-    return `https://www.reservecalifornia.com/Web/Default.aspx#!park/0/${rawId}`;
+    return 'https://www.reservecalifornia.com/CaliforniaWebHome/Facilities/SearchViewUnitAvailabity.aspx';
   }
   if (checkin && checkout) {
     return `https://www.recreation.gov/camping/campgrounds/${rawId}?start=${checkin}&end=${checkout}`;
@@ -245,18 +255,14 @@ function renderCalendarResults(container, data, searchPreference) {
     return;
   }
 
-  // Legend — only show relevant categories
+  // Legend — always show all categories so calendar colors are explained
   const legend = document.createElement('div');
   legend.className = 'calendar-legend';
-  let legendHtml = '';
-  if (allowedTypes.includes('priority'))
-    legendHtml += '<span class="legend-item"><span class="legend-swatch priority"></span> Weekend</span>';
-  if (allowedTypes.includes('regular'))
-    legendHtml += '<span class="legend-item"><span class="legend-swatch regular"></span> Flexible</span>';
-  if (allowedTypes.includes('ignored'))
-    legendHtml += '<span class="legend-item"><span class="legend-swatch ignored"></span> Weekday</span>';
-  legendHtml += '<span class="legend-item"><span class="legend-swatch unavailable"></span> Unavailable</span>';
-  legend.innerHTML = legendHtml;
+  legend.innerHTML =
+    '<span class="legend-item"><span class="legend-swatch priority"></span> Weekend</span>' +
+    '<span class="legend-item"><span class="legend-swatch regular"></span> Near Weekend</span>' +
+    '<span class="legend-item"><span class="legend-swatch ignored"></span> Midweek</span>' +
+    '<span class="legend-item"><span class="legend-swatch unavailable"></span> Unavailable</span>';
   container.appendChild(legend);
 
   // --- Build rows, filtered by allowed types ---
@@ -314,23 +320,28 @@ function renderCalendarResults(container, data, searchPreference) {
     if (allowedTypes.includes('priority') && counts.priority > 0)
       chips.push(`<span class="summary-chip priority">${counts.priority} Weekend</span>`);
     if (allowedTypes.includes('regular') && counts.regular > 0)
-      chips.push(`<span class="summary-chip regular">${counts.regular} Flexible</span>`);
+      chips.push(`<span class="summary-chip regular">${counts.regular} Near Weekend</span>`);
     if (allowedTypes.includes('ignored') && counts.ignored > 0)
-      chips.push(`<span class="summary-chip ignored">${counts.ignored} Weekday</span>`);
+      chips.push(`<span class="summary-chip ignored">${counts.ignored} Midweek</span>`);
     const total = counts.priority + counts.regular + counts.ignored;
-    const providerBadge = counts.provider === 'ReserveCalifornia'
+    const provider = counts.provider;
+    const parkId = counts.parkId;
+    const isRC = provider === 'ReserveCalifornia' || (parkId && parkId.startsWith('rc:'));
+    const rawId = (parkId || '').replace(/^(rg:|rc:)/, '');
+    const profileUrl = `/campground/${isRC ? 'rc' : 'rg'}/${rawId}`;
+    const providerBadge = isRC
       ? ' <span class="facility-type-badge rc" style="font-size:0.6rem;">CA Parks</span>' : '';
 
     // Campground section wrapper
     const section = document.createElement('div');
     section.className = 'summary-campground-section';
 
-    // Header row: name, chips, expand button
+    // Header row: name (linked to profile), chips, expand button
     const headerRow = document.createElement('div');
     headerRow.className = 'summary-campground-row';
     headerRow.innerHTML = `
       <div class="summary-campground-left">
-        <span class="summary-campground-name">${name}${providerBadge}</span>
+        <a class="summary-campground-name" href="${profileUrl}" target="_blank" rel="noopener">${name}</a>${providerBadge}
         <div class="summary-counts">${chips.join('')}<span class="summary-row-total">${total} date${total !== 1 ? 's' : ''}</span></div>
       </div>
       <button class="summary-expand-btn" aria-expanded="false" title="Show dates"><i class="fas fa-plus"></i></button>
@@ -343,32 +354,47 @@ function renderCalendarResults(container, data, searchPreference) {
     detailBody.style.display = 'none';
 
     const cgRows = grouped[name] || [];
-    const provider = counts.provider;
-    const parkId = counts.parkId;
 
     cgRows.forEach(r => {
       const row = document.createElement('a');
       row.className = 'avail-row';
       row.href = getBookingUrl(r.parkId, r.provider, r.checkin, r.checkout);
       row.target = '_blank';
+      row.rel = 'noopener';
       const typeLabel = TYPE_LABELS[r.type] || r.type;
       row.innerHTML = `
-        <span class="avail-checkin">${r.checkin} <small>(${r.dow})</small></span>
+        <span class="avail-checkin">${_fmtReadable(r.checkin)}</span>
         <span class="avail-arrow">&rarr;</span>
-        <span class="avail-checkout">${r.checkout}</span>
+        <span class="avail-checkout">${_fmtReadable(r.checkout)}</span>
         <span class="avail-sites">${r.count} site${r.count !== 1 ? 's' : ''}</span>
         <span class="avail-badge ${r.type}">${typeLabel}</span>
       `;
       detailBody.appendChild(row);
     });
 
-    // Link to booking site at bottom of detail
+    // Action links at bottom of detail
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'avail-detail-actions';
+
+    // View details → profile page (new window)
+    const detailsLink = document.createElement('a');
+    detailsLink.className = 'avail-details-link';
+    detailsLink.href = profileUrl;
+    detailsLink.target = '_blank';
+    detailsLink.rel = 'noopener';
+    detailsLink.innerHTML = `View details <i class="fas fa-arrow-right"></i>`;
+    actionsDiv.appendChild(detailsLink);
+
+    // Book on external site (new tab)
     const bookingLink = document.createElement('a');
     bookingLink.className = 'avail-booking-link';
     bookingLink.href = getBookingUrl(parkId, provider);
     bookingLink.target = '_blank';
-    bookingLink.innerHTML = `View on ${provider === 'ReserveCalifornia' ? 'ReserveCalifornia' : 'Recreation.gov'} <i class="fas fa-external-link-alt"></i>`;
-    detailBody.appendChild(bookingLink);
+    bookingLink.rel = 'noopener';
+    bookingLink.innerHTML = `Book on ${isRC ? 'reservecalifornia.com' : 'recreation.gov'} <i class="fas fa-external-link-alt"></i>`;
+    actionsDiv.appendChild(bookingLink);
+
+    detailBody.appendChild(actionsDiv);
 
     section.appendChild(detailBody);
 
@@ -398,24 +424,21 @@ function renderCalendarResults(container, data, searchPreference) {
   wrapper.className = 'calendar-comparison';
 
   Object.entries(calendarData).forEach(([name, info]) => {
-    // Filter dates for CalendarGrid to only include allowed types
-    const filteredDates = {};
-    Object.entries(info.dates || {}).forEach(([key, d]) => {
-      if (allowedTypes.includes(d.type)) filteredDates[key] = d;
-    });
+    const allDates = info.dates || {};
 
-    // Skip campground if no dates in allowed types
-    if (Object.keys(filteredDates).length === 0) return;
+    // Skip campground only if it has zero dates at all
+    if (Object.keys(allDates).length === 0) return;
 
     const slot = document.createElement('div');
     slot.className = 'calendar-slot';
     wrapper.appendChild(slot);
 
+    // Calendar always shows ALL dates (all types colored)
     new CalendarGrid(slot, {
       parkName: name,
       parkId: info.park_id,
       provider: info.provider || 'RecreationGov',
-      dates: filteredDates,
+      dates: allDates,
       searchStart: params.start_date,
       searchEnd: params.end_date,
       nights: params.nights,

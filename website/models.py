@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import json
+import re
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 import urllib.parse
@@ -201,4 +202,97 @@ class SearchHistory(db.Model):
             'search_preference': self.search_preference,
             'search_date': self.created_at.strftime('%b %d, %Y at %I:%M %p'),
             'search_url': f'/?parkId={self.park_id}&startDate={self.start_date.strftime("%Y-%m-%d") if self.start_date else ""}&endDate={self.end_date.strftime("%Y-%m-%d") if self.end_date else ""}&nights={self.nights}&searchPreference={self.search_preference}&campgroundName={park_name_safe}&city={city_safe}#results'
-        } 
+        }
+
+class Campground(db.Model):
+    __tablename__ = 'campgrounds'
+
+    id = db.Column(db.Integer, primary_key=True)
+    provider = db.Column(db.String(20))        # 'rg' or 'rc'
+    external_id = db.Column(db.String(30))     # '232447' or '718'
+    name = db.Column(db.String(300))
+    slug = db.Column(db.String(300), index=True)
+
+    # Location
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    address = db.Column(db.String(500))
+    city = db.Column(db.String(100))
+    state = db.Column(db.String(50))
+    zip_code = db.Column(db.String(20))
+
+    # Description (HTML from RIDB, parsed into sections)
+    description_overview = db.Column(db.Text)
+    description_recreation = db.Column(db.Text)
+    description_facilities = db.Column(db.Text)
+    description_natural_features = db.Column(db.Text)
+    description_nearby = db.Column(db.Text)
+    description_rules = db.Column(db.Text)
+    directions = db.Column(db.Text)
+
+    # Contact
+    phone = db.Column(db.String(50))
+    email = db.Column(db.String(200))
+
+    # Key facts (aggregated from campsites)
+    total_sites = db.Column(db.Integer)
+    site_types = db.Column(db.JSON)            # {"Standard": 150, "RV": 80}
+    loops = db.Column(db.JSON)                 # ["Upper Pines", "Lower Pines"]
+    checkin_time = db.Column(db.String(20))
+    checkout_time = db.Column(db.String(20))
+    max_vehicle_length = db.Column(db.Integer)
+    pets_allowed = db.Column(db.Boolean)
+    campfires_allowed = db.Column(db.Boolean)
+    ada_access = db.Column(db.Boolean)
+    reservable = db.Column(db.Boolean)
+    stay_limit = db.Column(db.String(100))
+    max_people_per_site = db.Column(db.Integer)
+    max_vehicles_per_site = db.Column(db.Integer)
+    shade_available = db.Column(db.Boolean)
+    permitted_equipment = db.Column(db.JSON)   # [{"name": "RV", "maxLength": 27}]
+    driveway_surface = db.Column(db.String(50))
+
+    # Media
+    photos = db.Column(db.JSON)                # [{"url": "...", "title": "...", ...}]
+    map_image_url = db.Column(db.String(500))
+
+    # Booking
+    booking_url = db.Column(db.String(500))
+    facility_type = db.Column(db.String(50))
+
+    # Keywords/tags
+    keywords = db.Column(db.String(500))
+
+    # Cache management
+    last_synced = db.Column(db.DateTime)
+    sync_status = db.Column(db.String(20), default='pending')
+
+    __table_args__ = (db.UniqueConstraint('provider', 'external_id'),)
+
+    def generate_slug(self):
+        """Generate a URL-friendly slug from the campground name."""
+        if not self.name:
+            return ''
+        slug = self.name.lower()
+        slug = re.sub(r'[^a-z0-9\s-]', '', slug)
+        slug = re.sub(r'[\s_]+', '-', slug)
+        slug = re.sub(r'-+', '-', slug).strip('-')
+        return slug
+
+    @property
+    def primary_photo(self):
+        """Return the primary photo URL or first available."""
+        if not self.photos:
+            return ''
+        for p in self.photos:
+            if p.get('isPrimary'):
+                return p.get('url', '')
+        return self.photos[0].get('url', '') if self.photos else ''
+
+    @property
+    def profile_url(self):
+        """Return the canonical profile URL."""
+        return f'/campground/{self.provider}/{self.external_id}'
+
+    def __repr__(self):
+        return f'<Campground {self.name} ({self.provider}:{self.external_id})>'

@@ -1916,7 +1916,7 @@ input[list]::-webkit-calendar-picker-indicator {
     border-radius: var(--radius-lg);
     padding: 28px;
     margin: 0 auto;
-    max-width: 700px;
+    max-width: 1600px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -2770,7 +2770,7 @@ input[list]::-webkit-calendar-picker-indicator {
 .map-list-container {
     display: flex;
     gap: 1rem;
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto var(--space-6);
     padding: 0 var(--space-4);
 }
@@ -2786,12 +2786,12 @@ input[list]::-webkit-calendar-picker-indicator {
 
 .homepage-map {
     width: 100%;
-    height: 500px;
+    height: 650px;
 }
 
 .campsite-list-panel {
     width: 380px;
-    max-height: 500px;
+    max-height: 650px;
     overflow-y: auto;
     background: rgba(30, 28, 24, 0.85);
     backdrop-filter: blur(8px);
@@ -3163,6 +3163,13 @@ input[list]::-webkit-calendar-picker-indicator {
     text-transform: uppercase;
     letter-spacing: 0.03em;
     white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+a.facility-type-badge:hover {
+    opacity: 0.8;
 }
 
 .facility-type-badge.campground {
@@ -3409,6 +3416,15 @@ input[list]::-webkit-calendar-picker-indicator {
 .bottom-sheet {
     position: relative;
     z-index: 50;
+    display: none; /* hidden on desktop until form fields are revealed */
+}
+
+/* Show the bottom sheet when form fields become visible or results are present */
+.bottom-sheet:has(.form-group.show),
+.bottom-sheet:has(.search-button.show),
+.bottom-sheet:has(.loading-spinner[style*="block"]),
+.bottom-sheet:has(.results-container:not(:empty)) {
+    display: block;
 }
 
 .bottom-sheet-handle {
@@ -3542,6 +3558,7 @@ input[list]::-webkit-calendar-picker-indicator {
 
     /* Bottom sheet: fixed at bottom */
     .page-index .bottom-sheet {
+        display: block; /* always visible on mobile */
         position: absolute;
         bottom: 0;
         left: 0;
@@ -3708,5 +3725,398 @@ input[list]::-webkit-calendar-picker-indicator {
         min-width: unset;
         padding: 8px 12px;
         font-size: 0.85rem;
+    }
+}
+
+/* ========================================
+   Campground Profile Page
+   ======================================== */
+
+.page-profile main {
+    padding: 0;
+    max-width: 100%;
+}
+
+/* Hero Section */
+.profile-hero {
+    position: relative;
+    min-height: 340px;
+    display: flex;
+    align-items: flex-end;
+    background-color: var(--primary-color);
+    background-size: cover;
+    background-position: center;
+}
+
+.profile-hero-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6);
+    color: #fff;
+}
+
+.profile-hero-badges {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+}
+
+.profile-hero-title {
+    font-size: 2.25rem;
+    color: #fff;
+    margin-bottom: var(--space-2);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.profile-hero-location {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: var(--space-4);
+}
+
+.profile-hero-location i {
+    margin-right: var(--space-1);
+}
+
+.profile-hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.profile-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.profile-btn:hover {
+    transform: translateY(-1px);
+}
+
+.profile-btn-primary {
+    background: var(--secondary-color);
+    color: #fff;
+}
+
+.profile-btn-primary:hover {
+    background: var(--secondary-hover);
+    color: #fff;
+}
+
+.profile-btn-secondary {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    backdrop-filter: blur(4px);
+}
+
+.profile-btn-secondary:hover {
+    background: rgba(255,255,255,0.3);
+    color: #fff;
+}
+
+/* Sections */
+.profile-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-6) 0;
+}
+
+.profile-section-title {
+    font-size: 1.35rem;
+    color: var(--text-color);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.profile-text-content {
+    color: var(--text-color);
+    line-height: 1.75;
+    font-size: 0.95rem;
+    white-space: pre-line;
+}
+
+/* Quick Facts Grid */
+.profile-facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.profile-fact {
+    text-align: center;
+    padding: var(--space-4) var(--space-2);
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.profile-fact-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: var(--space-2);
+}
+
+.profile-fact-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.profile-fact-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: var(--space-1);
+}
+
+.profile-details-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.profile-detail {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.profile-detail i {
+    color: var(--primary-color);
+    margin-right: var(--space-1);
+}
+
+/* Photo Gallery */
+.profile-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-3);
+}
+
+.profile-gallery-item {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    background: var(--border-color);
+}
+
+.profile-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+}
+
+.profile-gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+.profile-gallery-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-2) var(--space-3);
+    background: linear-gradient(transparent, rgba(0,0,0,0.6));
+    color: #fff;
+    font-size: 0.8rem;
+}
+
+/* Site Types & Equipment */
+.profile-site-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.profile-site-type-chip {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.profile-equipment {
+    margin-bottom: var(--space-4);
+}
+
+.profile-equipment h3 {
+    font-size: 1rem;
+    margin-bottom: var(--space-2);
+}
+
+.profile-equipment-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.profile-equipment-item {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+}
+
+.profile-detail-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-3);
+}
+
+.profile-loops {
+    margin-top: var(--space-3);
+}
+
+.profile-loops h3 {
+    font-size: 1rem;
+    margin-bottom: var(--space-2);
+}
+
+.profile-loops-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.profile-loop-chip {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+}
+
+/* Directions */
+.profile-directions-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.profile-directions-link:hover {
+    color: var(--primary-hover);
+}
+
+/* Contact */
+.profile-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.profile-contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.profile-contact-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow);
+    color: var(--primary-color);
+}
+
+.profile-contact-item i {
+    color: var(--primary-color);
+}
+
+/* Sync info */
+.profile-sync-info {
+    max-width: 1200px;
+    margin: var(--space-6) auto var(--space-8);
+    padding: 0 var(--space-6);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .profile-hero {
+        min-height: 260px;
+    }
+
+    .profile-hero-title {
+        font-size: 1.6rem;
+    }
+
+    .profile-hero-content {
+        padding: var(--space-6) var(--space-4);
+    }
+
+    .profile-section {
+        padding: var(--space-4) var(--space-4) 0;
+    }
+
+    .profile-facts-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-2);
+    }
+
+    .profile-fact {
+        padding: var(--space-3) var(--space-1);
+    }
+
+    .profile-fact-icon {
+        font-size: 1.2rem;
+    }
+
+    .profile-fact-value {
+        font-size: 1rem;
+    }
+
+    .profile-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-2);
+    }
+
+    .profile-hero-actions {
+        flex-direction: column;
+    }
+
+    .profile-btn {
+        justify-content: center;
+    }
+
+    .profile-contact {
+        flex-direction: column;
+    }
+
+    .profile-sync-info {
+        padding: 0 var(--space-4);
     }
 }

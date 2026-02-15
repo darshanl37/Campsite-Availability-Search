@@ -104,7 +104,10 @@ function fetchCampsites(lat, lng) {
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         body: JSON.stringify({ latitude: lat, longitude: lng })
     })
-    .then(r => r.json())
+    .then(r => {
+        if (!r.ok) throw new Error(`Search failed (${r.status})`);
+        return r.json();
+    })
     .then(data => {
         if (data.success) setCachedCampsites(lat, lng, data);
         return data;
@@ -247,20 +250,22 @@ function createLabeledMarker(map, site, index) {
 function buildSingleSiteInfoWindow(site) {
     const isRC = (site.provider || '').includes('California');
     const isCabin = (site.type || '').toLowerCase() === 'cabin';
+    const bookingUrl = site.booking_url || (isRC
+        ? 'https://www.reservecalifornia.com'
+        : `https://www.recreation.gov/camping/campgrounds/${(site.id || '').replace('rg:', '')}`);
     let typeBadge;
     if (isRC) {
-        typeBadge = '<span class="facility-type-badge rc">CA State Parks</span>';
+        typeBadge = `<a class="facility-type-badge rc" href="${bookingUrl}" target="_blank" rel="noopener">CA State Parks</a>`;
     } else if (isCabin) {
-        typeBadge = '<span class="facility-type-badge cabin">Cabin</span>';
+        typeBadge = `<a class="facility-type-badge cabin" href="${bookingUrl}" target="_blank" rel="noopener">Cabin</a>`;
     } else {
-        typeBadge = '<span class="facility-type-badge campground">Recreation.gov</span>';
+        typeBadge = `<a class="facility-type-badge campground" href="${bookingUrl}" target="_blank" rel="noopener">Recreation.gov</a>`;
     }
-    const bookingUrl = site.booking_url || (isRC
-        ? 'https://www.reservecalifornia.com/'
-        : `https://www.recreation.gov/camping/campgrounds/${(site.id || '').replace('rg:', '')}`);
     const desc = truncate(site.description, 150);
     const imageUrl = site.image_url || '';
     const isSelected = selectedMarkerIds.has(site.id);
+
+    const profileUrl = `/campground/${isRC ? 'rc' : 'rg'}/${(site.id || '').replace(/^(rg:|rc:)/, '')}`;
 
     return `
         ${imageUrl ? `<div class="iw-image"><img src="${imageUrl}" alt="${site.name}" /></div>` : ''}
@@ -272,8 +277,8 @@ function buildSingleSiteInfoWindow(site) {
             ${desc ? `<p class="iw-desc">${desc}</p>` : ''}
             <div class="iw-actions">
                 <button class="infowindow-select-btn" data-site-id="${site.id}">${isSelected ? 'Deselect' : 'Select'}</button>
-                <a class="iw-booking-link" href="${bookingUrl}" target="_blank" rel="noopener">
-                    View on ${isRC ? 'ReserveCalifornia' : 'Recreation.gov'} <i class="fas fa-external-link-alt"></i>
+                <a class="iw-details-link" href="${profileUrl}">
+                    View details <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>`;
@@ -290,13 +295,14 @@ function buildMultiSiteInfoWindow(sites) {
     let sitesHtml = sites.map(s => {
         const isRC = (s.provider || '').includes('California');
         const isCabin = (s.type || '').toLowerCase() === 'cabin';
-        let badge;
-        if (isRC) badge = '<span class="facility-type-badge rc" style="font-size:0.6rem">CA Parks</span>';
-        else if (isCabin) badge = '<span class="facility-type-badge cabin" style="font-size:0.6rem">Cabin</span>';
-        else badge = '<span class="facility-type-badge campground" style="font-size:0.6rem">Rec.gov</span>';
         const bookingUrl = s.booking_url || (isRC
-            ? 'https://www.reservecalifornia.com/'
+            ? 'https://www.reservecalifornia.com'
             : `https://www.recreation.gov/camping/campgrounds/${(s.id || '').replace('rg:', '')}`);
+        let badge;
+        if (isRC) badge = `<a class="facility-type-badge rc" href="${bookingUrl}" target="_blank" rel="noopener" style="font-size:0.6rem">CA Parks</a>`;
+        else if (isCabin) badge = `<a class="facility-type-badge cabin" href="${bookingUrl}" target="_blank" rel="noopener" style="font-size:0.6rem">Cabin</a>`;
+        else badge = `<a class="facility-type-badge campground" href="${bookingUrl}" target="_blank" rel="noopener" style="font-size:0.6rem">Rec.gov</a>`;
+        const profileUrl = `/campground/${isRC ? 'rc' : 'rg'}/${(s.id || '').replace(/^(rg:|rc:)/, '')}`;
         const isSelected = selectedMarkerIds.has(s.id);
 
         return `
@@ -308,9 +314,9 @@ function buildMultiSiteInfoWindow(sites) {
                     </div>
                     <button class="infowindow-select-btn" data-site-id="${s.id}">${isSelected ? 'Deselect' : 'Select'}</button>
                 </div>
-                <a class="iw-booking-link" href="${bookingUrl}" target="_blank" rel="noopener">
-                    View on ${isRC ? 'ReserveCalifornia' : 'Recreation.gov'} <i class="fas fa-external-link-alt"></i>
-                </a>
+                <div class="iw-multi-links">
+                    <a class="iw-details-link" href="${profileUrl}">Details <i class="fas fa-arrow-right"></i></a>
+                </div>
             </div>`;
     }).join('');
 
@@ -603,7 +609,11 @@ function loadCampgroundsAtCenter(lat, lng, locationLabel, panMap, filterBounds) 
                 homepageMap.fitBounds(bounds);
             }
         }
-    }).catch(err => console.error('Error fetching campsites:', err));
+    }).catch(err => {
+        console.error('Error fetching campsites:', err);
+        const searchAreaBtn = document.getElementById('searchAreaBtn');
+        if (searchAreaBtn) searchAreaBtn.style.display = 'flex';
+    });
 }
 
 // ========================================
@@ -643,7 +653,7 @@ function initHomepageMap() {
 
     homepageMap = new google.maps.Map(mapEl, {
         center: { lat: defaultLat, lng: defaultLng },
-        zoom: 8,
+        zoom: 10,
         mapTypeId: 'terrain',
         mapTypeControl: true,
         zoomControl: true,
@@ -656,15 +666,15 @@ function initHomepageMap() {
 
     fetchCampsites(defaultLat, defaultLng).then(data => {
         if (data.success && homepageMap) {
-            currentCampsites = data.campsites;
+            let campsites = data.campsites;
+            const bounds = homepageMap.getBounds();
+            if (bounds) {
+                campsites = campsites.filter(s =>
+                    bounds.contains({ lat: parseFloat(s.latitude), lng: parseFloat(s.longitude) })
+                );
+            }
             lastLoadedBounds = homepageMap.getBounds();
-            // Just place markers, don't show list panel yet
-            homepageMarkers.forEach(m => m.setMap(null));
-            homepageMarkers = [];
-            data.campsites.forEach((site, idx) => {
-                const marker = createLabeledMarker(homepageMap, site, idx);
-                homepageMarkers.push(marker);
-            });
+            populateCampsiteList(campsites, homepageMap, 'Nearby campgrounds');
         }
     });
 
@@ -1106,7 +1116,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!allChecked && checkboxes.length > 10) {
             const confirmed = confirm(
                 `You're about to select ${checkboxes.length} campgrounds.\n\n` +
-                `This will search in batches and may take 3-5 minutes.\n\n` +
                 `"All dates" option will be disabled.\n\nContinue?`
             );
             if (!confirmed) return;
