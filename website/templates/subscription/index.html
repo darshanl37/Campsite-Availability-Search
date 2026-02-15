@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Subscriptions - Campsite Availability Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/subscription.css') }}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle subscription deletion
+            const deleteButtons = document.querySelectorAll('.delete-subscription');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    if (confirm('Are you sure you want to delete this subscription? This cannot be undone.')) {
+                        const subscriptionId = this.dataset.id;
+                        
+                        fetch(`/subscription/${subscriptionId}/delete`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Remove subscription element from DOM
+                                const subscriptionElement = document.getElementById(`subscription-${subscriptionId}`);
+                                if (subscriptionElement) {
+                                    subscriptionElement.remove();
+                                }
+                                
+                                // Check if there are any subscriptions left
+                                const subscriptions = document.querySelectorAll('.subscription-item');
+                                if (subscriptions.length === 0) {
+                                    document.getElementById('subscription-list').innerHTML = 
+                                        '<div class="no-subscriptions">You don\'t have any active subscriptions. Search for a campground to get started.</div>';
+                                }
+                            } else {
+                                alert(data.error || 'Failed to delete subscription.');
+                            }
+                        })
+                        .catch(error => {
+                            alert('Error: ' + error);
+                        });
+                    }
+                });
+            });
+            
+            // Handle subscription toggling
+            const toggleButtons = document.querySelectorAll('.toggle-subscription');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const subscriptionId = this.dataset.id;
+                    const isActive = this.dataset.active === 'true';
+                    const newState = !isActive;
+                    
+                    fetch(`/subscription/${subscriptionId}/update`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `active=${newState}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update button state
+                            this.dataset.active = newState.toString();
+                            this.textContent = newState ? 'Pause' : 'Resume';
+                            
+                            // Update subscription status
+                            const statusElement = document.querySelector(`#subscription-${subscriptionId} .subscription-status`);
+                            if (statusElement) {
+                                statusElement.textContent = newState ? 'Active' : 'Paused';
+                                statusElement.className = `subscription-status ${newState ? 'active' : 'paused'}`;
+                            }
+                        } else {
+                            alert(data.error || 'Failed to update subscription.');
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error: ' + error);
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav>
+        <div class="nav-center">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/history" class="nav-link">History</a>
+            <a href="/about" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="subscription-container">
+            <div class="subscription-header">
+                <h1>Your Subscriptions</h1>
+                <a href="/" class="new-subscription-button">New Search</a>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div id="subscription-list" class="subscription-list">
+                {% if subscriptions %}
+                    {% for subscription in subscriptions %}
+                        <div id="subscription-{{ subscription.subscription_id }}" class="subscription-item">
+                            <div class="subscription-info">
+                                <h2 class="subscription-name">{{ subscription.campground_name or 'Campground ' + subscription.park_id }}</h2>
+                                <div class="subscription-details">
+                                    <span class="subscription-dates">
+                                        <i class="fas fa-calendar"></i>
+                                        {{ subscription.start_date.strftime('%b %d') }} - {{ subscription.end_date.strftime('%b %d, %Y') }}
+                                    </span>
+                                    <span class="subscription-nights">
+                                        <i class="fas fa-moon"></i>
+                                        {{ subscription.nights }} consecutive night{% if subscription.nights != 1 %}s{% endif %}
+                                    </span>
+                                    <span class="subscription-preference">
+                                        <i class="fas fa-filter"></i>
+                                        {% if subscription.search_preference == 'weekends' %}
+                                            Weekends Only
+                                        {% elif subscription.search_preference == 'flexible' %}
+                                            Flexible Weekend
+                                        {% else %}
+                                            All Available Dates
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="subscription-meta">
+                                    <span class="subscription-status {{ 'active' if subscription.active else 'paused' }}">
+                                        {{ 'Active' if subscription.active else 'Paused' }}
+                                    </span>
+                                    <span class="subscription-created">
+                                        Created {{ subscription.created_at.strftime('%b %d, %Y') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="subscription-actions">
+                                <a href="{{ url_for('subscription.view', subscription_id=subscription.subscription_id) }}" class="subscription-button view-button">
+                                    View
+                                </a>
+                                <button 
+                                    class="subscription-button toggle-subscription" 
+                                    data-id="{{ subscription.subscription_id }}"
+                                    data-active="{{ 'true' if subscription.active else 'false' }}"
+                                >
+                                    {{ 'Pause' if subscription.active else 'Resume' }}
+                                </button>
+                                <button 
+                                    class="subscription-button delete-subscription" 
+                                    data-id="{{ subscription.subscription_id }}"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-subscriptions">
+                        You don't have any active subscriptions. Search for a campground to get started.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

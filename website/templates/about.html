@@ -3,92 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Campsite Availability Search</title>
+    <title>About - CampFinder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        body {
-            background: linear-gradient(
-                rgba(255, 255, 255, 0.22),
-                rgba(255, 255, 255, 0.22)
-            ),
-            url("https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=2070&auto=format&fit=crop");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        .about-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .about-container h1 {
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-            font-size: 1.8rem;
-        }
-
-        .about-container p {
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-
-        .feature-list {
-            margin: 1.5rem 0;
-            padding-left: 1.2rem;
-        }
-
-        .feature-list li {
-            margin-bottom: 0.5rem;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="page-about">
     <nav>
-        <div class="nav-center">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/history" class="nav-link">History</a>
-            <a href="/about" class="nav-link">About</a>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/">
+                    <i class="fas fa-campground"></i>
+                    <span>CampFinder</span>
+                </a>
+                <span class="nav-tagline">Find available campsites</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/history" class="nav-link">History</a>
+                <a href="/about" class="nav-link">About</a>
+                {% if current_user is defined and current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.profile') }}" class="nav-link"><i class="fas fa-user-circle"></i></a>
+                    <a href="{{ url_for('auth.logout') }}" class="nav-link"><i class="fas fa-sign-out-alt"></i></a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="nav-link"><i class="fas fa-sign-in-alt"></i></a>
+                    <a href="{{ url_for('auth.signup') }}" class="nav-link"><i class="fas fa-user-plus"></i></a>
+                {% endif %}
+            </div>
         </div>
     </nav>
 
     <main>
         <div class="about-container">
-            <h1>About Campsite Availability Search</h1>
-            
-            <p>Welcome to Campsite Availability Search! This tool helps you find available campsites at your favorite 
-            Recreation.gov locations, making it easier to plan your outdoor adventures.</p>
+            <h1>CampFinder</h1>
+            <p class="about-lead">Find available campsites across Recreation.gov and California State Parks — all in one search.</p>
 
-            <h2>Key Features:</h2>
+            <h2>What It Does</h2>
+            <p>CampFinder searches thousands of campsites and dates in seconds, showing you exactly when and where spots are open. No more clicking through calendars one day at a time.</p>
+
+            <h2>Features</h2>
             <ul class="feature-list">
-                <li>Search for campgrounds near any city in the US</li>
-                <li>Find available dates for specific campgrounds</li>
-                <li>Filter for weekend-only availability</li>
-                <li>View campsite locations on an interactive map</li>
-                <li>Quick access to Recreation.gov booking</li>
+                <li><strong>Two networks, one search</strong> — Recreation.gov (national forests, BLM, NPS) and ReserveCalifornia (CA state parks)</li>
+                <li><strong>Interactive map</strong> — Browse campgrounds visually, select multiple, search all at once</li>
+                <li><strong>Smart date filtering</strong> — Weekends only, flexible (Thu-Mon), or all days</li>
+                <li><strong>Calendar view</strong> — See availability at a glance with color-coded dates</li>
+                <li><strong>Watch & notify</strong> — Set up alerts and get emailed when sites open up</li>
+                <li><strong>Search by name</strong> — Find campgrounds by name, not just by city</li>
+                <li><strong>Direct booking links</strong> — One tap to the official booking page</li>
             </ul>
 
-            <p>This project is currently in development. More features and improvements are coming soon!</p>
-
-            <h2>How to Use:</h2>
+            <h2>How to Use</h2>
             <ol class="feature-list">
-                <li>Enter a city to find nearby campgrounds</li>
-                <li>Click on a campground to get its Park ID</li>
-                <li>Set your desired date range and preferences</li>
-                <li>Click "Search Availability" to see available dates</li>
-                <li>Click on any available date to book through Recreation.gov</li>
+                <li>Search for a city or campground name in the search bar</li>
+                <li>Select one or more campgrounds from the map or list</li>
+                <li>Set your date range, number of nights, and day preference</li>
+                <li>Hit "Search Availability" and wait 10-30 seconds</li>
+                <li>Browse results — tap any date to book directly</li>
+                <li>Optionally set up a watch to get notified when new spots open</li>
             </ol>
 
-            <p style="margin-top: 2rem; font-style: italic;">
-                Note: This is an independent tool and is not affiliated with Recreation.gov. 
-                All bookings are made through the official Recreation.gov website.
+            <h2>Accounts & Notifications</h2>
+            <p>Sign up with email or Google to save your search history and set up campsite watches. Free accounts get 3 active watches with unlimited email notifications.</p>
+
+            <div class="about-tiers">
+                <div class="about-tier">
+                    <h3>Free</h3>
+                    <ul>
+                        <li>3 active watches</li>
+                        <li>Email notifications</li>
+                        <li>Search history</li>
+                    </ul>
+                </div>
+                <div class="about-tier">
+                    <h3>Basic — $1</h3>
+                    <ul>
+                        <li>10 active watches</li>
+                        <li>Email + SMS notifications</li>
+                    </ul>
+                </div>
+                <div class="about-tier">
+                    <h3>Supporter — $5/mo</h3>
+                    <ul>
+                        <li>Unlimited watches</li>
+                        <li>Email + SMS + WhatsApp</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p class="about-disclaimer">
+                CampFinder is an independent tool and is not affiliated with Recreation.gov or ReserveCalifornia. All bookings are made through the official websites.
             </p>
         </div>
     </main>
 </body>
-</html> 
+</html>

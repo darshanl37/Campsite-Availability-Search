@@ -3,154 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search History - Campsite Availability Search</title>
+    <title>History & Watches - CampFinder</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        body {
-            background: linear-gradient(
-                rgba(255, 255, 255, 0.22),
-                rgba(255, 255, 255, 0.22)
-            ),
-            url("https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=2070&auto=format&fit=crop");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        .history-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .history-item {
-            padding: 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .history-item:hover {
-            background-color: var(--background-color);
-            transform: translateX(5px);
-        }
-
-        .history-details {
-            flex: 1;
-        }
-
-        .history-city {
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .history-park {
-            margin-top: 0.25rem;
-            font-size: 0.9rem;
-        }
-
-        .history-id {
-            color: var(--text-color);
-            opacity: 0.8;
-        }
-
-        .clear-history {
-            background-color: var(--accent-color);
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            margin-bottom: 1rem;
-        }
-
-        .clear-history:hover {
-            opacity: 0.9;
-        }
-
-        .no-history {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-color);
-            font-style: italic;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <nav>
-        <div class="nav-center">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/history" class="nav-link">History</a>
-            <a href="/about" class="nav-link">About</a>
-        </div>
-    </nav>
+<body class="page-history">
+    <header>
+        <nav>
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="/">
+                        <i class="fas fa-campground"></i>
+                        <span>CampFinder</span>
+                    </a>
+                    <span class="nav-tagline">Find available campsites</span>
+                </div>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/history" class="nav-link">History</a>
+                    <a href="/about" class="nav-link">About</a>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.profile') }}" class="nav-link"><i class="fas fa-user-circle"></i></a>
+                        <a href="{{ url_for('auth.logout') }}" class="nav-link"><i class="fas fa-sign-out-alt"></i></a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="nav-link"><i class="fas fa-sign-in-alt"></i></a>
+                        <a href="{{ url_for('auth.signup') }}" class="nav-link"><i class="fas fa-user-plus"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
 
     <main>
         <div class="history-container">
-            <h1>Search History</h1>
-            <button id="clearHistory" class="clear-history">Clear History</button>
-            <div id="historyList">
-                <!-- History items will be inserted here -->
+
+            <!-- Notifications Section (Coming Soon) -->
+            <div class="watches-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-bell"></i> Notifications</h2>
+                    <span class="section-subtitle coming-soon-badge">Coming Soon</span>
+                </div>
+                <div class="watches-empty">
+                    <p>Set up watches on your searches and get notified by email when campsites open up. This feature is coming soon!</p>
+                </div>
             </div>
+
+            <!-- Search History Section -->
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> Search History</h2>
+                <span class="section-subtitle">Your recent searches</span>
+            </div>
+
+            {% if history_items %}
+                <div class="history-list">
+                    {% for item in history_items %}
+                    <a href="{{ item.search_url }}" class="history-row">
+                        <div class="history-row-left">
+                            <span class="history-name">{{ item.park_name or ('Campground ' + item.park_id) }}</span>
+                            <span class="history-meta">
+                                {{ item.start_date }} - {{ item.end_date }}
+                                &middot; {{ item.nights }}n
+                                &middot; {{ item.search_preference }}
+                            </span>
+                        </div>
+                        <div class="history-row-right">
+                            <span class="history-date-ago">{{ item.search_date }}</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-history">
+                    <i class="fas fa-search"></i>
+                    <p>No search history yet. <a href="/">Start searching</a> for campsites.</p>
+                </div>
+            {% endif %}
         </div>
     </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const historyList = document.getElementById('historyList');
-            const clearButton = document.getElementById('clearHistory');
-            
-            function loadHistory() {
-                const history = JSON.parse(localStorage.getItem('campsiteHistory') || '[]');
-                historyList.innerHTML = '';
-                
-                if (history.length === 0) {
-                    historyList.innerHTML = '<div class="no-history">No search history yet</div>';
-                    return;
-                }
-                
-                history.forEach(item => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    historyItem.innerHTML = `
-                        <div class="history-details">
-                            <div class="history-city">${item.city}</div>
-                            <div class="history-park">
-                                ${item.parkName}
-                                <span class="history-id">ID: ${item.parkId}</span>
-                            </div>
-                        </div>
-                    `;
-                    
-                    historyItem.addEventListener('click', () => {
-                        // Populate the form on the home page and redirect
-                        sessionStorage.setItem('fillParkId', item.parkId);
-                        window.location.href = '/';
-                    });
-                    
-                    historyList.appendChild(historyItem);
-                });
-            }
-            
-            clearButton.addEventListener('click', () => {
-                if (confirm('Are you sure you want to clear your search history?')) {
-                    localStorage.removeItem('campsiteHistory');
-                    loadHistory();
-                }
-            });
-            
-            loadHistory();
-        });
-    </script>
 </body>
-</html> 
+</html>

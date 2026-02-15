@@ -3,104 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campsite Availability Search</title>
+    <title>CampFinder - Find Available Campsites</title>
+    <meta name="description" content="Search for available campsites near you on Recreation.gov and ReserveCalifornia. Find weekend camping spots with real-time availability checking.">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        body {
-            background: linear-gradient(
-                rgba(255, 255, 255, 0.22),
-                rgba(255, 255, 255, 0.22)
-            ),
-            url("https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=2070&auto=format&fit=crop");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script src="https://maps.googleapis.com/maps/api/js?key={{ MAPS_API_KEY }}&libraries=places,maps"></script>
     <script>
         const MAPS_API_KEY = "{{ MAPS_API_KEY }}";
+        // Make current_user available to JavaScript
+        window.current_user = {% if current_user and current_user.is_authenticated %}true{% else %}false{% endif %};
+
+        // Function to show selected campground
+        function showSelectedCampground(name) {
+            document.getElementById('campgroundNameDisplay').textContent = name;
+            document.getElementById('selectedCampground').style.display = 'block';
+        }
+
+        // Function to clear campground selection
+        function clearCampgroundSelection() {
+            document.getElementById('parkId').value = '';
+            document.getElementById('selectedCampground').style.display = 'none';
+            document.getElementById('campgroundNameDisplay').textContent = '';
+
+            // Uncheck all checkboxes and remove selected class
+            const checkboxes = document.querySelectorAll('.campsite-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                const item = cb.closest('.campsite-item');
+                if (item) {
+                    item.classList.remove('selected');
+                }
+            });
+
+            // Show the campsite list again
+            const existingList = document.querySelector('.campsite-list');
+            if (existingList) {
+                existingList.style.display = 'block';
+            }
+
+            // Update Select All button text
+            const selectAllBtn = document.querySelector('.select-all-btn');
+            if (selectAllBtn) {
+                selectAllBtn.textContent = 'Select All';
+            }
+        }
     </script>
+    <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to show additional form fields
+            function handleCitySearch() {
+                const formGroups = document.querySelectorAll('.form-group:not(.city-search-group)');
+                const searchButton = document.querySelector('.search-button');
+
+                formGroups.forEach(group => {
+                    group.classList.add('show');
+                });
+
+                searchButton.classList.add('show');
+            }
+
+            // Make handleCitySearch available globally
+            window.handleCitySearch = handleCitySearch;
+
+            // Handle search form submission
+            const searchForm = document.getElementById('searchForm');
+            const resultsContainer = document.getElementById('results');
+            const loadingSpinner = document.getElementById('loading-spinner');
+
+            searchForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                // Show loading spinner with dynamic message
+                loadingSpinner.style.display = 'block';
+
+                // Get form data first to determine campground count
+                const formData = new FormData(searchForm);
+                const parkIds = formData.get('parkId').split(',').filter(id => id.trim());
+
+                // Update loading message based on number of campgrounds
+                const loadingMessageEl = document.querySelector('#loading-spinner .loading-message');
+                if (parkIds.length > 10) {
+                    const batches = Math.ceil(parkIds.length / 5);
+                    loadingMessageEl.textContent = `Searching ${parkIds.length} campgrounds in ${batches} batches... This may take ${batches * 2}-${batches * 2 + 2} minutes.`;
+                } else if (parkIds.length > 1) {
+                    loadingMessageEl.textContent = `Searching ${parkIds.length} campgrounds... This takes 30-60 seconds.`;
+                } else {
+                    loadingMessageEl.textContent = 'Searching Recreation.gov... This takes 10-30 seconds.';
+                }
+
+                // Open bottom sheet to full on mobile, scroll on desktop
+                if (window.openBottomSheet) window.openBottomSheet('full');
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+
+                const searchParams = new URLSearchParams();
+
+                // Convert FormData to URLSearchParams
+                for (const [key, value] of formData.entries()) {
+                    searchParams.append(key, value);
+                }
+
+                // Create data object for the search API
+                const searchData = {
+                    parkId: formData.get('parkId'),
+                    startDate: formData.get('startDate'),
+                    endDate: formData.get('endDate'),
+                    nights: formData.get('nights'),
+                    searchPreference: formData.get('searchPreference')
+                };
+
+                // Try to get the campground name if populated
+                const parkId = formData.get('parkId');
+                if (parkId) {
+                    // Check if we have the campground name saved in a data attribute
+                    const parkIdField = document.getElementById('parkId');
+                    if (parkIdField) {
+                        searchData.campgroundName = parkIdField.getAttribute('data-campground-name') || '';
+                        searchData.city = parkIdField.getAttribute('data-city') || '';
+                    }
+                }
+
+                console.log("Sending search request with data:", searchData);
+
+                // Make direct API call to /search instead of getting results page
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify(searchData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Received response:", data);
+
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+
+                    if (data.success) {
+                        renderCalendarResults(resultsContainer, data, searchData.searchPreference);
+                    } else {
+                        // Show error
+                        resultsContainer.innerHTML = `
+                            <div class="alert alert-error">
+                                Error: ${data.error || 'Failed to retrieve results'}
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    loadingSpinner.style.display = 'none';
+                    resultsContainer.innerHTML = `
+                        <div class="alert alert-error">
+                            Error fetching results. Please try again.
+                        </div>
+                    `;
+                });
+            });
+
+            // Form validation function
+            function validateSearchForm() {
+                const parkId = document.getElementById('parkId').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const nights = parseInt(document.getElementById('nights').value);
+                const searchPreference = document.querySelector('input[name="searchPreference"]:checked').value;
+
+                if (!parkId) {
+                    alert('Please select a campground first!');
+                    return false;
+                }
+
+                // Check number of campgrounds
+                const parkIds = parkId.split(',').filter(id => id.trim());
+
+                // Warn for very large searches
+                if (parkIds.length > 15 && searchPreference === 'all') {
+                    alert(
+                        `You've selected ${parkIds.length} campgrounds with "All dates" option.\n\n` +
+                        `This search would take too long. Please select "Weekends" or "Flexible" instead, ` +
+                        `or reduce the number of campgrounds.`
+                    );
+                    return false;
+                }
+
+                // Info message for large searches
+                if (parkIds.length > 10) {
+                    const estimatedTime = Math.ceil(parkIds.length / 5) * 2; // ~2 min per batch of 5
+                    alert(
+                        `Searching ${parkIds.length} campgrounds...\n\n` +
+                        `This will run in batches and take approximately ${estimatedTime}-${estimatedTime + 2} minutes.\n\n` +
+                        `Please be patient and don't close this tab.`
+                    );
+                }
+
+                if (!startDate || !endDate) {
+                    alert('Please select start and end dates');
+                    return false;
+                }
+
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (start < today) {
+                    alert('Start date cannot be in the past');
+                    return false;
+                }
+
+                if (end <= start) {
+                    alert('End date must be after start date');
+                    return false;
+                }
+
+                const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                if (nights > daysDiff) {
+                    alert(`Number of nights (${nights}) cannot exceed the date range (${daysDiff} days)`);
+                    return false;
+                }
+
+                if (nights < 1) {
+                    alert('Number of nights must be at least 1');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Update form submission to include validation
+            const originalSubmit = searchForm.onsubmit;
+            searchForm.addEventListener('submit', function(e) {
+                if (!validateSearchForm()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+        });
+    </script>
 </head>
-<body>
+<body class="page-index">
+    <header>
     <nav>
-        <div class="nav-center">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/history" class="nav-link">History</a>
-            <a href="/about" class="nav-link">About</a>
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="/">
+                        <i class="fas fa-campground"></i>
+                        <span>CampFinder</span>
+                    </a>
+                    <span class="nav-tagline">Find available campsites</span>
+                </div>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/history" class="nav-link">History</a>
+                    <a href="/about" class="nav-link">About</a>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.profile') }}" class="nav-link"><i class="fas fa-user-circle"></i></a>
+                        <a href="{{ url_for('auth.logout') }}" class="nav-link"><i class="fas fa-sign-out-alt"></i></a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="nav-link"><i class="fas fa-sign-in-alt"></i></a>
+                        <a href="{{ url_for('auth.signup') }}" class="nav-link"><i class="fas fa-user-plus"></i></a>
+                    {% endif %}
+                </div>
         </div>
     </nav>
+    </header>
 
     <main>
-        <div class="search-container">
-            <form id="searchForm" action="/results" method="GET">
-                <div class="form-group">
-                    <label for="citySearch">Search Park ID's near a city</label>
-                    <div class="search-with-button">
-                        <input 
-                            type="text" 
-                            id="citySearch" 
-                            name="citySearch" 
-                            placeholder="Start typing city or region name..."
-                        >
-                        <button type="button" class="search-city-button">
-                            <span>⌕</span>
-                        </button>
+
+        <!-- Full-viewport map layer -->
+        <div id="mapLayer" class="map-layer">
+            <!-- Floating search bar on map -->
+            <div class="map-search-bar">
+                <div class="search-with-button">
+                    <input
+                        type="text"
+                        id="citySearch"
+                        name="citySearch"
+                        placeholder="Search by city or campground name..."
+                    >
+                    <button type="button" class="search-city-button" onclick="handleCitySearch()">
+                        <span>&#x2315;</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="mapListContainer" class="map-list-container">
+                <div id="homepageMapSection" class="homepage-map-section">
+                    <div id="homepageMap" class="homepage-map"></div>
+                    <button id="searchAreaBtn" class="search-area-btn" style="display:none;">
+                        <i class="fas fa-search"></i> Search this area
+                    </button>
+                    <!-- Floating selection badge -->
+                    <div id="mapSelectionBadge" class="map-selection-badge" style="display:none;">
+                        <span id="mapSelectionCount">0</span> selected
+                        <button type="button" id="mapViewListBtn" class="map-view-list-btn">View List</button>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="parkId">Park ID</label>
-                    <input type="text" id="parkId" name="parkId" placeholder="eg: 234015" required>
+                <div id="campsiteListPanel" class="campsite-list-panel" style="display:none;">
+                    <!-- Populated by JS after city search or campground name search -->
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="startDate">Start Date</label>
-                        <input type="date" id="startDate" name="startDate" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="endDate">End Date</label>
-                        <input type="date" id="endDate" name="endDate" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="nights">Number of Consecutive Nights</label>
-                    <input type="number" id="nights" name="nights" min="1" value="2" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Search Preference</label>
-                    <div class="radio-container">
-                        <div class="radio-group">
-                            <input type="radio" id="weekendsOnly" name="searchPreference" value="weekends" checked>
-                            <label for="weekendsOnly">Weekends Only (Friday-Sunday)</label>
-                        </div>
-                        <div class="radio-group">
-                            <input type="radio" id="flexibleWeekend" name="searchPreference" value="flexible">
-                            <label for="flexibleWeekend">Flexible Weekend (Thursday-Monday)</label>
-                        </div>
-                        <div class="radio-group">
-                            <input type="radio" id="allDates" name="searchPreference" value="all">
-                            <label for="allDates">Show All Available Dates</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="notify" name="notify">
-                    <label for="notify">Notify me when availability changes (Coming Soon)</label>
-                </div>
-
-                <button type="submit" class="search-button">Search Availability</button>
-            </form>
+            </div>
         </div>
 
-        <div id="results" class="results-container">
+        <!-- Bottom sheet (mobile: pull-up panel; desktop: below map) -->
+        <div id="bottomSheet" class="bottom-sheet">
+            <div class="bottom-sheet-handle" id="bottomSheetHandle">
+                <div class="handle-bar"></div>
+                <div class="bottom-sheet-peek" id="bottomSheetPeek">
+                    <span class="peek-label">Search options</span>
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+            <div class="bottom-sheet-content" id="bottomSheetContent">
+                <div class="search-container">
+                    <form id="searchForm" action="/results" method="GET" onsubmit="return false;">
+
+                        <!-- Hidden Park ID field -->
+                        <input type="hidden" id="parkId" name="parkId" required>
+
+                        <!-- Display selected campground name -->
+                        <div id="selectedCampground" class="selected-campground form-group" style="display: none;">
+                            <label>Selected Campground</label>
+                            <div class="campground-display">
+                                <i class="fas fa-campground"></i>
+                                <span id="campgroundNameDisplay"></span>
+                                <button type="button" class="change-campground-btn" onclick="clearCampgroundSelection()">
+                                    <i class="fas fa-times"></i> Change
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group dates-group">
+                                <label for="startDate">Start Date</label>
+                                <input type="date" id="startDate" name="startDate" required>
+                            </div>
+
+                            <div class="form-group dates-group">
+                                <label for="endDate">End Date</label>
+                                <input type="date" id="endDate" name="endDate" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group nights-group">
+                            <label for="nights">Number of Consecutive Nights</label>
+                            <input type="number" id="nights" name="nights" min="1" value="2" required>
+                        </div>
+
+                        <div class="form-group preference-group">
+                            <label>Search Preference</label>
+                            <div class="preference-pills">
+                                <label class="preference-pill" data-value="weekends">
+                                    <input type="radio" id="weekendsOnly" name="searchPreference" value="weekends">
+                                    <i class="fas fa-sun"></i>
+                                    <span class="pill-label">Fri - Sun</span>
+                                    <span class="pill-subtitle">Weekends</span>
+                                </label>
+                                <label class="preference-pill" data-value="flexible">
+                                    <input type="radio" id="flexibleWeekend" name="searchPreference" value="flexible">
+                                    <i class="fas fa-calendar-week"></i>
+                                    <span class="pill-label">Thu - Mon</span>
+                                    <span class="pill-subtitle">Flexible</span>
+                                </label>
+                                <label class="preference-pill active" data-value="all">
+                                    <input type="radio" id="allDates" name="searchPreference" value="all" checked>
+                                    <i class="fas fa-calendar"></i>
+                                    <span class="pill-label">Any Day</span>
+                                    <span class="pill-subtitle">All Days</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="search-button">Search Availability</button>
+                    </form>
+                </div>
+
+                <div id="loading-spinner" class="loading-spinner">
+                    <i class="fas fa-spinner"></i>
+                    <div class="loading-message">Searching Recreation.gov...</div>
+                    <div class="loading-submessage">This typically takes 10-30 seconds</div>
+                    <div class="loading-tip">Tip: We're checking thousands of dates for you</div>
+                </div>
+
+                <div id="results" class="results-container"></div>
+            </div>
         </div>
     </main>
 </body>
-</html> 
+</html>

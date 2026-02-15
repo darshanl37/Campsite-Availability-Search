@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campground Search Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .search-results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .results-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--muted-foreground);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .back-button:hover {
+            color: var(--foreground);
+        }
+        
+        .new-search-form {
+            max-width: 600px;
+            margin: 2rem auto;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .campgrounds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .campground-card {
+            background-color: var(--muted);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .campground-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .campground-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: var(--background);
+        }
+        
+        .campground-content {
+            padding: 1.5rem;
+        }
+        
+        .campground-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .campground-description {
+            color: var(--muted-foreground);
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .campground-amenities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .amenity-tag {
+            background-color: var(--background);
+            color: var(--accent);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .campgrounds-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .new-search-form {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .campgrounds-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+    <div class="search-results-container">
+        <div class="results-header">
+            <a href="{{ url_for('index') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            
+            <h1>Campgrounds near {{ location }}</h1>
+            <p class="hero-subtitle">Showing results within {{ radius }} miles</p>
+            
+            <form action="/search" method="get" class="new-search-form">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-map-marker-alt location-icon"></i>
+                    <input type="text" name="location" id="location" placeholder="Try another location" value="{{ location }}" required>
+                </div>
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i> Search Again
+                </button>
+            </form>
+        </div>
+        
+        {% if campgrounds %}
+            <div class="campgrounds-grid">
+                {% for campground in campgrounds %}
+                    <div class="campground-card">
+                        <div class="campground-image-container">
+                            {% if campground.image %}
+                                <img src="{{ campground.image }}" alt="{{ campground.name }}" class="campground-image">
+                            {% else %}
+                                <div class="campground-image" style="background-color: #1a1a1a; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-campground" style="font-size: 3rem; color: #2e7d32;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="campground-content">
+                            <h2 class="campground-name">{{ campground.name }}</h2>
+                            <p class="campground-description">{{ campground.description }}</p>
+                            
+                            {% if campground.amenities %}
+                                <div class="campground-amenities">
+                                    {% for amenity in campground.amenities %}
+                                        <span class="amenity-tag">{{ amenity }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-results">
+                <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--muted-foreground); margin-bottom: 1rem;"></i>
+                <h2>No campgrounds found</h2>
+                <p>Try searching in a different location or increasing the search radius.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2023 Camping Reservation. All rights reserved.</p>
+    </footer>
+</body>
+</html> 

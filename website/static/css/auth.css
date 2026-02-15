@@ -1,0 +1,310 @@
+/* Authentication Styles */
+.auth-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: var(--space-8);
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    color: var(--text-color);
+    margin-bottom: var(--space-2);
+}
+
+.auth-subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: var(--space-6);
+}
+
+.auth-form {
+    margin-bottom: var(--space-6);
+}
+
+.auth-button {
+    width: 100%;
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.auth-button i {
+    font-size: 1.25rem;
+}
+
+.auth-links {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.auth-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.auth-links a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: var(--space-6) 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.auth-divider::before {
+    margin-right: var(--space-4);
+}
+
+.auth-divider::after {
+    margin-left: var(--space-4);
+}
+
+.social-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background-color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: var(--space-4);
+    box-shadow: var(--shadow-sm);
+}
+
+.social-button:hover {
+    box-shadow: var(--shadow);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.social-button img {
+    width: 24px;
+    height: 24px;
+    margin-right: var(--space-3);
+}
+
+.google-button {
+    color: #757575;
+}
+
+/* Profile Page */
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-6);
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto var(--space-4);
+    border: 3px solid var(--primary-color);
+    box-shadow: var(--shadow);
+}
+
+.profile-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-name {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-2);
+    color: var(--text-color);
+}
+
+.profile-email {
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+}
+
+.profile-language {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-4);
+}
+
+.subscription-status {
+    display: inline-block;
+    margin-top: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    background-color: var(--background-color);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.subscription-status.paid {
+    background-color: rgba(46, 125, 91, 0.1);
+    color: var(--success-color);
+}
+
+.upgrade-link {
+    margin-left: var(--space-2);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.profile-section {
+    margin-bottom: var(--space-8);
+    padding: var(--space-6);
+    background-color: var(--background-color);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+.profile-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-4);
+    color: var(--text-color);
+}
+
+.notification-settings {
+    margin-bottom: var(--space-6);
+}
+
+.notification-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    padding: var(--space-3);
+    border-radius: var(--radius);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.notification-option label {
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    width: 100%;
+}
+
+.verification-status {
+    font-size: 0.75rem;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    margin-left: var(--space-2);
+}
+
+.verification-status.verified {
+    background-color: rgba(46, 125, 91, 0.1);
+    color: var(--success-color);
+}
+
+.verification-status.unverified {
+    background-color: rgba(212, 135, 14, 0.1);
+    color: var(--warning-color);
+}
+
+.verify-button {
+    margin-left: var(--space-2);
+    font-size: 0.75rem;
+    padding: var(--space-1) var(--space-2);
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+}
+
+.verify-button:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Verification Page */
+.verification-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: var(--space-6);
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.verification-input {
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 0.5rem;
+    width: 100%;
+    margin-bottom: var(--space-4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .auth-container,
+    .profile-container,
+    .verification-container {
+        margin: 1rem;
+        padding: var(--space-4);
+    }
+    
+    .profile-section {
+        padding: var(--space-4);
+    }
+}
+
+@media (max-width: 480px) {
+    .notification-option label {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+    
+    .verification-status,
+    .verify-button {
+        margin-left: 0;
+        margin-top: var(--space-1);
+    }
+} 

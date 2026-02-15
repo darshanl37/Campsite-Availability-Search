@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify {{ verification_type|capitalize }} - Campsite Availability Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sendCodeForm = document.getElementById('sendCodeForm');
+            const verifyCodeForm = document.getElementById('verifyCodeForm');
+            const phoneInput = document.getElementById('phone');
+            const sendCodeButton = document.getElementById('sendCodeButton');
+            const codeInputs = document.querySelectorAll('.code-input');
+            
+            // Handle code inputs
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('keyup', function(e) {
+                    if (e.key >= '0' && e.key <= '9') {
+                        // Move to next input if available
+                        if (index < codeInputs.length - 1) {
+                            codeInputs[index + 1].focus();
+                        }
+                    } else if (e.key === 'Backspace') {
+                        // Move to previous input if available
+                        if (index > 0) {
+                            codeInputs[index - 1].focus();
+                        }
+                    }
+                    
+                    // Combine all inputs into hidden field
+                    document.getElementById('code').value = Array.from(codeInputs)
+                        .map(input => input.value)
+                        .join('');
+                });
+            });
+            
+            // Handle sending code
+            sendCodeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Disable button and show loading
+                sendCodeButton.disabled = true;
+                sendCodeButton.textContent = 'Sending...';
+                
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('type', '{{ verification_type }}');
+                
+                // Add phone number if provided
+                if (phoneInput) {
+                    formData.append('{{ verification_type }}', phoneInput.value);
+                }
+                
+                // Send code via AJAX
+                fetch('{{ url_for("auth.send_code") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show verification form
+                        document.getElementById('sendCodeSection').style.display = 'none';
+                        document.getElementById('verifyCodeSection').style.display = 'block';
+                    } else {
+                        alert(data.error || 'Failed to send verification code.');
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error);
+                })
+                .finally(() => {
+                    // Re-enable button
+                    sendCodeButton.disabled = false;
+                    sendCodeButton.textContent = 'Send Code';
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav>
+        <div class="nav-center">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/history" class="nav-link">History</a>
+            <a href="/about" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="verification-container">
+            <h1>Verify Your {{ verification_type|capitalize }}</h1>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div id="sendCodeSection">
+                <p class="verification-instructions">
+                    {% if verification_type == 'sms' %}
+                        We'll send a verification code to your phone number. Standard message rates may apply.
+                    {% elif verification_type == 'whatsapp' %}
+                        We'll send a verification code to your WhatsApp number.
+                    {% endif %}
+                </p>
+                
+                <form id="sendCodeForm" method="POST" action="{{ url_for('auth.send_code') }}">
+                    <div class="form-group">
+                        <label for="{{ verification_type }}">{{ verification_type|capitalize }} Number</label>
+                        <input 
+                            type="tel" 
+                            id="{{ verification_type }}" 
+                            name="{{ verification_type }}" 
+                            value="{% if verification_type == 'sms' %}{{ user.phone }}{% elif verification_type == 'whatsapp' %}{{ user.whatsapp }}{% endif %}"
+                            placeholder="Enter your {{ verification_type|capitalize }} number"
+                            required
+                        >
+                        <p class="input-help">Include country code, e.g., +1 for USA</p>
+                    </div>
+                    
+                    <input type="hidden" name="type" value="{{ verification_type }}">
+                    <button type="submit" id="sendCodeButton" class="auth-button">Send Code</button>
+                </form>
+            </div>
+            
+            <div id="verifyCodeSection" style="display: none;">
+                <p class="verification-instructions">
+                    We've sent a verification code to your {{ verification_type|capitalize }} number. 
+                    Enter the 6-digit code below.
+                </p>
+                
+                <form id="verifyCodeForm" method="POST" action="{{ url_for('auth.verify', type=verification_type) }}">
+                    <div class="verification-code">
+                        <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code" required>
+                        <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                        <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                    </div>
+                    
+                    <input type="hidden" id="code" name="code">
+                    <button type="submit" class="auth-button">Verify Code</button>
+                </form>
+                
+                <a href="#" class="resend-code" onclick="document.getElementById('sendCodeForm').submit(); return false;">
+                    Didn't receive the code? Send again
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

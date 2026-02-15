@@ -1,24 +1,30 @@
 import subprocess
+import sys
+import os
 import argparse
+import json as json_module
 from datetime import datetime, timedelta
+
+# Resolve camping.py path relative to this script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CAMPING_PY = os.path.join(SCRIPT_DIR, "camping.py")
 
 def run_camping_script(args):
     # Prepare the command
     command = [
-        "python", "camping.py",
+        sys.executable, CAMPING_PY,
         "--start-date", args.start_date,
         "--end-date", args.end_date,
         "--parks", *args.parks,
         "--nights", str(args.nights),
+        "--show-campsite-info",
     ]
-    if args.show_campsite_info:
-        command.append("--show-campsite-info")
-    
+
     # Run the script
     result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
         raise RuntimeError(f"Error running camping.py: {result.stderr}")
-    
+
     return result.stdout
 
 def parse_camping_output(output):
@@ -30,7 +36,7 @@ def parse_camping_output(output):
         line = line.strip()
         if line.startswith("🏕"):
             park_info = line.split(":")[0]
-            current_park = park_info.split("(")[0].strip()
+            current_park = park_info.replace("🏕", "").strip()
             parsed_data[current_park] = {}
         elif line.startswith("* Site"):
             site_id = line.split()[2]
@@ -154,6 +160,21 @@ def display_results(priority_results, regular_results, ignored_results):
         for date_range, site_count in date_ranges.items():
             print(f"  {date_range} --> {site_count} site(s) available")
 
+
+def build_json_output(priority_results, regular_results, ignored_results):
+    """Build structured JSON output keyed by park name."""
+    result = {}
+    # Collect all park names across all result dicts
+    all_parks = set(list(priority_results.keys()) + list(regular_results.keys()) + list(ignored_results.keys()))
+    for park in all_parks:
+        result[park] = {
+            "priority": priority_results.get(park, {}),
+            "regular": regular_results.get(park, {}),
+            "ignored": ignored_results.get(park, {}),
+        }
+    return result
+
+
 if __name__ == "__main__":
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Wrapper for camping.py")
@@ -162,15 +183,22 @@ if __name__ == "__main__":
     parser.add_argument("--parks", required=True, nargs="+", help="List of park IDs")
     parser.add_argument("--nights", type=int, required=True, help="Minimum number of nights required")
     parser.add_argument("--show-campsite-info", action="store_true", help="Show detailed campsite info")
+    parser.add_argument("--json-output", action="store_true", help="Output results as JSON")
 
     args = parser.parse_args()
-    
+
     # Run camping.py and process its output
     try:
         output = run_camping_script(args)
         parsed_data = parse_camping_output(output)
         priority_results, regular_results, ignored_results = filter_by_days(parsed_data, args.nights)
-        display_results(priority_results, regular_results, ignored_results)
+        if args.json_output:
+            print(json_module.dumps(build_json_output(priority_results, regular_results, ignored_results)))
+        else:
+            display_results(priority_results, regular_results, ignored_results)
     except Exception as e:
-        print(f"Error: {e}")
+        if args.json_output:
+            print(json_module.dumps({"error": str(e)}))
+        else:
+            print(f"Error: {e}")
 

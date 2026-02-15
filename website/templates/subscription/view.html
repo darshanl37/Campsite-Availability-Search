@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Details - Campsite Availability Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/subscription.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="nav-center">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/history" class="nav-link">History</a>
+            <a href="/about" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="subscription-details-container">
+            <div class="subscription-details-header">
+                <a href="{{ url_for('subscription.index') }}" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Subscriptions
+                </a>
+                <h1>Subscription Details</h1>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="subscription-details-card">
+                <div class="subscription-details-section">
+                    <h2>{{ subscription.campground_name or 'Campground ' + subscription.park_id }}</h2>
+                    <div class="detail-item">
+                        <span class="detail-label">Park ID:</span>
+                        <span class="detail-value">{{ subscription.park_id }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Date Range:</span>
+                        <span class="detail-value">{{ subscription.start_date.strftime('%b %d, %Y') }} - {{ subscription.end_date.strftime('%b %d, %Y') }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Consecutive Nights:</span>
+                        <span class="detail-value">{{ subscription.nights }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Search Preference:</span>
+                        <span class="detail-value">
+                            {% if subscription.search_preference == 'weekends' %}
+                                Weekends Only (Friday-Sunday)
+                            {% elif subscription.search_preference == 'flexible' %}
+                                Flexible Weekend (Thursday-Monday)
+                            {% else %}
+                                All Available Dates
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value status-badge {{ 'active' if subscription.active else 'paused' }}">
+                            {{ 'Active' if subscription.active else 'Paused' }}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Created:</span>
+                        <span class="detail-value">{{ subscription.created_at.strftime('%b %d, %Y at %H:%M') }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Last Checked:</span>
+                        <span class="detail-value">
+                            {% if subscription.last_checked %}
+                                {{ subscription.last_checked.strftime('%b %d, %Y at %H:%M') }}
+                            {% else %}
+                                Not checked yet
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Last Notification:</span>
+                        <span class="detail-value">
+                            {% if subscription.last_notification %}
+                                {{ subscription.last_notification.strftime('%b %d, %Y at %H:%M') }}
+                            {% else %}
+                                No notifications sent yet
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Check Frequency:</span>
+                        <span class="detail-value">Every {{ subscription.check_frequency }} minutes</span>
+                    </div>
+                </div>
+                
+                <div class="subscription-details-section">
+                    <h3>Manage Subscription</h3>
+                    <div class="subscription-form">
+                        <form id="updateFrequencyForm" action="{{ url_for('subscription.update', subscription_id=subscription.subscription_id) }}" method="POST">
+                            <div class="form-group">
+                                <label for="checkFrequency">Check Frequency (minutes)</label>
+                                <input 
+                                    type="number" 
+                                    id="checkFrequency" 
+                                    name="checkFrequency" 
+                                    min="15" 
+                                    max="1440" 
+                                    value="{{ subscription.check_frequency }}"
+                                >
+                                <p class="input-help">How often we should check for availability (15 minutes minimum, 24 hours maximum)</p>
+                            </div>
+                            <button type="submit" class="subscription-button">Update Frequency</button>
+                        </form>
+                    </div>
+                    
+                    <div class="subscription-actions">
+                        <a href="https://www.recreation.gov/camping/campgrounds/{{ subscription.park_id }}" class="subscription-button view-button" target="_blank">
+                            View on Recreation.gov
+                        </a>
+                        
+                        <form id="toggleForm" action="{{ url_for('subscription.update', subscription_id=subscription.subscription_id) }}" method="POST">
+                            <input type="hidden" name="active" value="{{ 'false' if subscription.active else 'true' }}">
+                            <button type="submit" class="subscription-button toggle-button">
+                                {{ 'Pause Subscription' if subscription.active else 'Resume Subscription' }}
+                            </button>
+                        </form>
+                        
+                        <form id="deleteForm" action="{{ url_for('subscription.delete', subscription_id=subscription.subscription_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this subscription? This cannot be undone.');">
+                            <button type="submit" class="subscription-button delete-button">
+                                Delete Subscription
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="notification-history">
+                <h3>Notification History</h3>
+                {% if subscription.notifications %}
+                    <div class="notification-list">
+                        {% for notification in subscription.notifications|sort(attribute='created_at', reverse=True) %}
+                            <div class="notification-item">
+                                <div class="notification-time">
+                                    {{ notification.created_at.strftime('%b %d, %Y at %H:%M') }}
+                                </div>
+                                <div class="notification-message">
+                                    {% set message = notification.message|from_json %}
+                                    <ul class="changes-list">
+                                        {% for change in message %}
+                                            <li>{{ change }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="notification-channels">
+                                    {% if notification.sent_email %}
+                                        <span class="channel-badge email">Email</span>
+                                    {% endif %}
+                                    
+                                    {% if notification.sent_sms %}
+                                        <span class="channel-badge sms">SMS</span>
+                                    {% endif %}
+                                    
+                                    {% if notification.sent_whatsapp %}
+                                        <span class="channel-badge whatsapp">WhatsApp</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-notifications">
+                        No notifications have been sent for this subscription yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

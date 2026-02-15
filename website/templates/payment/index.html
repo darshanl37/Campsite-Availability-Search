@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plans - CampFinder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .plans-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .plans-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .plans-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .free-features {
+            text-align: center;
+            background: rgba(46, 125, 91, 0.06);
+            border: 1px solid rgba(46, 125, 91, 0.2);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .free-features h3 {
+            color: var(--success-color);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .free-features p {
+            color: var(--success-color);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .tier-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .tier-cards { grid-template-columns: 1fr; }
+        }
+
+        .tier-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .tier-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 20px rgba(26, 92, 76, 0.12);
+        }
+
+        .tier-card.active-tier {
+            border-color: var(--success-color);
+            background: rgba(46, 125, 91, 0.06);
+        }
+
+        .tier-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .tier-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .tier-price small {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #6B7280;
+        }
+
+        .tier-features {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+            text-align: left;
+        }
+
+        .tier-features li {
+            padding: 0.35rem 0;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .tier-features li::before {
+            content: "\2713";
+            color: var(--success-color);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .tier-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tier-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .tier-btn.primary:hover {
+            filter: brightness(1.05);
+        }
+
+        .tier-btn:disabled {
+            background: #D1D5DB;
+            cursor: default;
+        }
+
+        .current-plan-badge {
+            display: inline-block;
+            background: var(--success-color);
+            color: white;
+            padding: 0.2rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+    <script>
+        function checkout(tier) {
+            const btn = document.getElementById('btn-' + tier);
+            btn.disabled = true;
+            btn.textContent = 'Redirecting...';
+
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+            fetch('{{ url_for("payment.create_stripe_checkout") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ tier: tier }),
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.checkout_url;
+                } else {
+                    alert(data.error || 'Something went wrong.');
+                    btn.disabled = false;
+                    btn.textContent = 'Subscribe';
+                }
+            })
+            .catch(() => {
+                alert('Network error.');
+                btn.disabled = false;
+                btn.textContent = 'Subscribe';
+            });
+        }
+    </script>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/"><i class="fas fa-campground"></i><span>CampFinder</span></a>
+            </div>
+            <div class="nav-center">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/history" class="nav-link">History</a>
+                <a href="/about" class="nav-link">About</a>
+            </div>
+            <div class="nav-right">
+                <a href="{{ url_for('auth.profile') }}" class="nav-link"><i class="fas fa-user-circle"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="plans-container">
+            <div class="plans-header">
+                <h1>Choose Your Plan</h1>
+                <p style="color: #6B7280;">Search and email notifications are always free.</p>
+            </div>
+
+            <div class="free-features">
+                <h3>Always Included (Free)</h3>
+                <p>Unlimited searches &middot; Unlimited email notifications &middot; Up to 3 active watches</p>
+            </div>
+
+            {% set is_basic = user.subscription_tier == 'basic' and user._tier_active() %}
+            {% set is_supporter = user.subscription_tier == 'supporter' and user._tier_active() %}
+
+            <div class="tier-cards">
+                <!-- Basic -->
+                <div class="tier-card {% if is_basic %}active-tier{% endif %}">
+                    {% if is_basic %}<span class="current-plan-badge">Current Plan</span>{% endif %}
+                    <div class="tier-name">Basic</div>
+                    <div class="tier-price">$1<small>/mo</small></div>
+                    <ul class="tier-features">
+                        <li>SMS &amp; WhatsApp alerts</li>
+                        <li>Up to 10 active watches</li>
+                        <li>Everything in Free</li>
+                    </ul>
+                    {% if is_basic %}
+                        <button class="tier-btn" disabled>Subscribed</button>
+                    {% elif is_supporter %}
+                        <button class="tier-btn" disabled>Included</button>
+                    {% else %}
+                        <button id="btn-basic" class="tier-btn primary" onclick="checkout('basic')">Subscribe</button>
+                    {% endif %}
+                </div>
+
+                <!-- Supporter -->
+                <div class="tier-card {% if is_supporter %}active-tier{% endif %}">
+                    {% if is_supporter %}<span class="current-plan-badge">Current Plan</span>{% endif %}
+                    <div class="tier-name">Supporter</div>
+                    <div class="tier-price">$5<small>/mo</small></div>
+                    <ul class="tier-features">
+                        <li>Everything in Basic</li>
+                        <li>Unlimited active watches</li>
+                        <li>Support development</li>
+                    </ul>
+                    {% if is_supporter %}
+                        <button class="tier-btn" disabled>Subscribed</button>
+                    {% else %}
+                        <button id="btn-supporter" class="tier-btn primary" onclick="checkout('supporter')">Subscribe</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

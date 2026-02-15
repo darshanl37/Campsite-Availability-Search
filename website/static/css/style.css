@@ -1,15 +1,58 @@
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap');
+
+/* ========================================
+   Alpine Dusk Theme — CampFinder
+   ======================================== */
 
 :root {
-    --primary-color: #4C6EF5;       /* A refined blue */
-    --secondary-color: #82C91E;     /* A complementary green accent */
-    --accent-color: #F59F00;        /* Accent for emphasis if needed */
-    --background-color: #E9ECEF;    /* Darker gray background */
-    --text-color: #495057;          /* Deep, classy gray for text */
-    --border-color: #CED4DA;
-    --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Nature-inspired color palette */
+    --primary-color: #1A5C4C;       /* Forest teal */
+    --primary-hover: #14473A;       /* Darker teal for hover */
+    --secondary-color: #D4870E;     /* Warm amber / campfire */
+    --secondary-hover: #B8740A;     /* Darker amber for hover */
+    --accent-color: #C45D3E;        /* Terracotta */
+    --background-color: #F7F5F2;    /* Warm off-white */
+    --card-bg: #FFFFFF;             /* White for cards */
+    --text-color: #2D2A26;          /* Warm black */
+    --text-muted: #6B6560;          /* Warm muted */
+    --border-color: #E8E3DC;        /* Warm border */
+    --success-color: #2E7D5B;       /* Forest green */
+    --error-color: #C0392B;         /* Deep red */
+    --warning-color: #D4870E;       /* Amber */
+
+    /* Gradient tokens */
+    --gradient-primary: linear-gradient(135deg, #1A5C4C 0%, #237A66 100%);
+    --gradient-secondary: linear-gradient(135deg, #D4870E 0%, #E09B2E 100%);
+    --gradient-hero: linear-gradient(170deg, rgba(26,92,76,0.72) 0%, rgba(30,28,24,0.65) 100%);
+
+    /* Elevation and shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(45, 42, 38, 0.06);
+    --shadow: 0 4px 12px -2px rgba(45, 42, 38, 0.10), 0 2px 4px -1px rgba(45, 42, 38, 0.06);
+    --shadow-md: 0 10px 24px -4px rgba(45, 42, 38, 0.12), 0 4px 8px -2px rgba(45, 42, 38, 0.06);
+    --shadow-lg: 0 20px 40px -8px rgba(45, 42, 38, 0.14), 0 8px 16px -4px rgba(45, 42, 38, 0.06);
+
+    /* Spacing system */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+
+    /* Border radius */
+    --radius-sm: 0.25rem;
+    --radius: 0.5rem;
+    --radius-md: 0.625rem;
+    --radius-lg: 0.875rem;
+    --radius-full: 9999px;
 }
+
+/* ========================================
+   Reset & Base
+   ======================================== */
 
 * {
     margin: 0;
@@ -17,223 +60,704 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Lato', sans-serif;
-    color: var(--text-color);
-    line-height: 1.6;
-    padding-bottom: 2rem;
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
 }
 
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-color);
+    line-height: 1.6;
+    background-color: var(--background-color);
+    padding-bottom: var(--space-16);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+}
+
+/* ========================================
+   Typography
+   ======================================== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    font-size: 2.75rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+p {
+    margin-bottom: var(--space-4);
+}
+
+label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+/* ========================================
+   Fade-in Animation
+   ======================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* ========================================
+   Navigation — Pill-style Hover
+   ======================================== */
+
 nav {
-    background-color: white;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 1rem;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: var(--space-3) var(--space-6);
+    box-shadow: 0 1px 0 var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.nav-logo {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+}
+
+.nav-logo a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.nav-logo i {
+    font-size: 1.5rem;
 }
 
 .nav-center {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
 }
 
 .nav-link {
     text-decoration: none;
     color: var(--text-color);
-    font-weight: 700;
-    transition: color 0.2s;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .nav-link:hover {
+    background-color: rgba(26, 92, 76, 0.08);
     color: var(--primary-color);
 }
 
-main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1rem;
+/* Tagline next to logo */
+.nav-tagline {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 0.5rem;
+    white-space: nowrap;
 }
+
+/* Single-row nav links (replaces nav-center + nav-right) */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* Responsive navigation */
+@media (max-width: 768px) {
+    nav {
+        padding: var(--space-2) var(--space-3) !important;
+    }
+
+    .nav-container {
+        flex-wrap: nowrap;
+    }
+
+    .nav-logo a {
+        font-size: 1rem;
+        gap: 6px;
+    }
+
+    .nav-logo i {
+        font-size: 1.1rem;
+    }
+
+    .nav-tagline {
+        display: none;
+    }
+
+    .nav-links {
+        gap: 2px;
+    }
+
+    .nav-link {
+        padding: 6px 8px;
+        font-size: 0.78rem;
+    }
+
+    .nav-link span {
+        display: none;
+    }
+
+    .nav-link i {
+        font-size: 1rem;
+    }
+}
+
+/* ========================================
+   Cards and Containers
+   ======================================== */
 
 .search-container {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 2rem;
+    background-color: var(--card-bg);
+    padding: var(--space-8);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: var(--space-8);
+    border: 1px solid var(--border-color);
+    transition: box-shadow 0.2s ease;
 }
 
+/* ========================================
+   Form Elements
+   ======================================== */
+
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-6);
 }
 
 .form-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-6);
+    margin-bottom: var(--space-4);
 }
 
 .form-row .form-group {
     flex: 1;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 700;
+    min-width: 200px;
+    margin-bottom: 0;
 }
 
 input[type="text"],
 input[type="date"],
-input[type="number"] {
+input[type="number"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
+    padding: var(--space-3) var(--space-4);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
     font-size: 1rem;
+    font-family: inherit;
+    color: var(--text-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: var(--card-bg);
 }
 
 input[type="text"]:focus,
 input[type="date"]:focus,
-input[type="number"]:focus {
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 4px rgba(76,110,245,0.3);
+    box-shadow: 0 0 0 3px rgba(26, 92, 76, 0.15);
+}
+
+input[type="text"]:focus-visible,
+input[type="date"]:focus-visible,
+input[type="number"]:focus-visible,
+input[type="email"]:focus-visible,
+input[type="password"]:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
 .radio-container {
     display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .radio-group {
     display: flex;
     align-items: center;
-    padding: 0.15rem;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    padding: var(--space-2) var(--space-3);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .radio-group:hover {
-    background-color: var(--background-color);
+    border-color: var(--primary-color);
+    background-color: rgba(26, 92, 76, 0.04);
 }
 
 .radio-group input[type="radio"] {
-    margin-right: 0.5rem;
+    margin-right: var(--space-2);
 }
 
 .checkbox-group {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    margin-bottom: var(--space-3);
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: var(--space-2);
+}
+
+/* ========================================
+   Buttons — Gradient + Lift-on-Hover
+   ======================================== */
+
+.search-button,
+.notify-button,
+.search-city-button,
+.auth-button,
+button[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+    background: var(--gradient-primary);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.search-button:hover,
+.notify-button:hover,
+.search-city-button:hover,
+.auth-button:hover,
+button[type="submit"]:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.search-button:active,
+.notify-button:active,
+.search-city-button:active,
+.auth-button:active,
+button[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.search-button:focus-visible,
+.notify-button:focus-visible,
+.search-city-button:focus-visible,
+.auth-button:focus-visible,
+button[type="submit"]:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
 .search-button {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
     width: 100%;
-    transition: background-color 0.2s;
+    padding: var(--space-4) var(--space-6);
+    font-size: 1.125rem;
+    margin-top: var(--space-2);
 }
 
-.search-button:hover {
-    background-color: var(--secondary-color);
+.search-city-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
+
+.secondary-button {
+    background: white;
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.secondary-button:hover {
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.success-button {
+    background: var(--gradient-secondary);
+}
+
+.success-button:hover {
+    filter: brightness(1.05);
+}
+
+.warning-button {
+    background-color: var(--warning-color);
+}
+
+.error-button {
+    background-color: var(--error-color);
+}
+
+/* ========================================
+   Results
+   ======================================== */
 
 .results-container {
-    margin-top: 2rem;
+    margin-top: var(--space-8);
+}
+
+/*
+ * Reset dark-page inherited white text inside the results container.
+ * The index page uses white text globally for the dark overlay background,
+ * but results cards have white backgrounds — so we force dark text here.
+ */
+.page-index .results-container {
+    color: #2D2A26;
+}
+
+.page-index .results-container .results-summary-bar,
+.page-index .results-container .summary-campground-section,
+.page-index .results-container .summary-campground-row,
+.page-index .results-container .summary-detail-body,
+.page-index .results-container .avail-row,
+.page-index .results-container .calendar-legend,
+.page-index .results-container .calendar-slot,
+.page-index .results-container .cal-grid,
+.page-index .results-container .no-results {
+    color: #2D2A26;
+}
+
+.page-index .results-container .summary-campground-name {
+    color: #1a1a1a;
+}
+
+.page-index .results-container .summary-row-total,
+.page-index .results-container .summary-total,
+.page-index .results-container .avail-arrow,
+.page-index .results-container .cal-dow {
+    color: #8C8780;
+}
+
+.page-index .results-container .avail-sites {
+    color: var(--success-color);
+}
+
+.page-index .results-container .avail-booking-link {
+    color: #2563EB;
+}
+
+.page-index .results-container .summary-expand-btn {
+    color: #8C8780;
+    background: #f5f5f5;
+    border-color: #e0e0e0;
+}
+
+.page-index .results-container .avail-checkin,
+.page-index .results-container .avail-checkout {
+    color: #2D2A26;
+}
+
+.page-index .results-container .cal-header a {
+    color: var(--primary-color);
+}
+
+.page-index .results-container .cal-day {
+    color: #2D2A26;
+}
+
+.page-index .results-container .legend-item {
+    color: #2D2A26;
+}
+
+.page-index .results-container .cal-nav-btn {
+    color: #2D2A26;
+    border-color: #e0e0e0;
+}
+
+.page-index .results-container .cal-month-title {
+    color: #2D2A26;
+}
+
+.page-index .results-container .cal-nav-btn:hover:not(:disabled) {
+    background: #f5f5f5;
+}
+
+.page-index .results-container .alert {
+    color: #2D2A26;
+}
+
+.page-index .results-container .watch-search-section {
+    color: #2D2A26;
 }
 
 .results-section {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 1rem;
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
 }
 
 .results-section h2 {
-    margin-bottom: 0.75rem;
-    color: var(--primary-color);
-    font-weight: 700;
-    font-size: 1.1rem;
-    padding: 0.25rem 0;
+    font-size: 1.5rem;
+    margin-bottom: var(--space-6);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--space-3);
 }
 
 .result-item {
-    margin-bottom: 0.5rem;
+    padding: var(--space-4);
+    border-radius: var(--radius);
+    background-color: var(--card-bg);
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--border-color);
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.result-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+    border-color: var(--primary-color);
 }
 
 .result-text {
-    flex: 1;
-    font-family: monospace;
-    white-space: pre-wrap;
-    word-break: break-all;
+    margin-bottom: var(--space-3);
+    color: var(--text-muted);
 }
 
 .campground-name {
-    background-color: white;
-    color: var(--text-color);
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    box-shadow: var(--card-shadow);
+    margin-bottom: var(--space-2);
+    color: var(--text-color);
 }
 
 .campground-name a {
-    color: var(--text-color);
+    color: var(--primary-color);
     text-decoration: none;
-    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
 }
 
 .campground-name a:hover {
+    text-decoration: underline;
+}
+
+/* ========================================
+   Notification Bar
+   ======================================== */
+
+.notification-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+.notify-button {
+    padding: var(--space-2) var(--space-4);
+    background: var(--gradient-secondary);
+}
+
+.notify-button:hover {
+    filter: brightness(1.05);
+}
+
+/* Login prompt */
+.login-prompt {
+    text-align: center;
+    padding: var(--space-6);
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+    margin: var(--space-8) 0;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.login-prompt a {
+    font-weight: 600;
     color: var(--primary-color);
 }
 
-.change-notification {
-    background-color: var(--secondary-color);
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    text-align: center;
-    animation: slideIn 0.5s ease-out;
+.login-prompt a:hover {
+    text-decoration: underline;
 }
 
-@keyframes slideIn {
-    from {
-        transform: translateY(-100%);
-        opacity: 0;
+/* ========================================
+   Alerts and Messages
+   ======================================== */
+
+.alert {
+    padding: var(--space-4);
+    border-radius: var(--radius);
+    margin-bottom: var(--space-4);
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: rgba(46, 125, 91, 0.08);
+    color: var(--success-color);
+    border: 1px solid rgba(46, 125, 91, 0.2);
+}
+
+.alert-error {
+    background-color: rgba(192, 57, 43, 0.08);
+    color: var(--error-color);
+    border: 1px solid rgba(192, 57, 43, 0.2);
+}
+
+.alert-warning {
+    background-color: rgba(212, 135, 14, 0.08);
+    color: var(--warning-color);
+    border: 1px solid rgba(212, 135, 14, 0.2);
+}
+
+.alert-info {
+    background-color: rgba(26, 92, 76, 0.08);
+    color: var(--primary-color);
+    border: 1px solid rgba(26, 92, 76, 0.2);
+}
+
+/* ========================================
+   Responsive — Forms & Cards
+   ======================================== */
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: var(--space-4);
     }
-    to {
-        transform: translateY(0);
-        opacity: 1;
+
+    .form-row .form-group {
+        width: 100%;
+    }
+
+    .search-container,
+    .results-section {
+        padding: var(--space-4);
+    }
+
+    .nav-center {
+        gap: var(--space-2);
     }
 }
 
-.no-results {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-    font-style: italic;
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+
+    .notification-bar {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .notify-button {
+        width: 100%;
+    }
 }
 
-/* Add new styles for the restructured result line */
+/* ========================================
+   Result Card Styles (date line / availability)
+   ======================================== */
+
 .result-date-range {
     flex: 1;
     font-size: 1rem;
 }
 
 .result-availability {
-    background-color: var(--primary-color);
+    background: var(--gradient-primary);
     color: #fff;
     padding: 0.4rem 0.8rem;
     border-radius: 12px;
@@ -241,20 +765,20 @@ input[type="number"]:focus {
     font-weight: bold;
     margin-left: auto;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .result-availability:hover {
-    background-color: var(--secondary-color);
+    filter: brightness(1.1);
+    box-shadow: var(--shadow);
 }
 
-/* Add new styles for vertical stacked layout with icons */
 .result-card {
     background-color: #fff;
     padding: 0.75rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    box-shadow: var(--card-shadow);
+    box-shadow: var(--shadow-sm);
 }
 
 .result-date-line {
@@ -274,12 +798,11 @@ input[type="number"]:focus {
 }
 
 .result-date-text {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--text-color);
     font-size: 1rem;
 }
 
-/* For mobile screens */
 @media (max-width: 600px) {
     .result-date-line {
         flex-wrap: wrap;
@@ -294,6 +817,10 @@ input[type="number"]:focus {
     }
 }
 
+/* ========================================
+   City Search
+   ======================================== */
+
 .search-with-button {
     position: relative;
     display: flex;
@@ -307,10 +834,10 @@ input[type="number"]:focus {
 }
 
 .search-city-button {
-    background-color: var(--primary-color);
+    background: var(--gradient-primary);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius);
     width: 40px;
     height: 40px;
     display: flex;
@@ -318,32 +845,33 @@ input[type="number"]:focus {
     justify-content: center;
     cursor: pointer;
     font-size: 1.4rem;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .search-city-button:hover {
-    background-color: var(--secondary-color);
+    filter: brightness(1.1);
+    box-shadow: var(--shadow);
 }
 
-/* Style the datalist dropdown */
+/* Datalist / Google Places */
 input[list]::-webkit-calendar-picker-indicator {
     color: var(--text-color);
     font-size: 1rem;
 }
 
-/* Style Google Places Autocomplete dropdown */
 .pac-container {
-    border-radius: 4px;
+    border-radius: var(--radius);
     margin-top: 2px;
-    box-shadow: var(--card-shadow);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border-color);
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
+    z-index: 9999 !important;
 }
 
 .pac-item {
     padding: 8px 12px;
     cursor: pointer;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .pac-item:hover {
@@ -355,29 +883,18 @@ input[list]::-webkit-calendar-picker-indicator {
     color: var(--text-color);
 }
 
+/* ========================================
+   Campsite List & Selection
+   ======================================== */
+
 .campsite-list {
     background: white;
     padding: 0.5rem;
-    border-radius: 8px;
-    box-shadow: var(--card-shadow);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
     margin-bottom: 1.5rem;
     display: flex;
     flex-direction: column;
-}
-
-.campsite-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    padding: 0 0.5rem;
-}
-
-.click-note {
-    font-size: 0.8rem;
-    color: var(--text-color);
-    opacity: 0.7;
-    font-style: italic;
 }
 
 .campsite-list h3 {
@@ -388,34 +905,96 @@ input[list]::-webkit-calendar-picker-indicator {
 }
 
 .campsite-item {
-    padding: 0.4rem 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
+    padding: 0.6rem 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
     margin-bottom: 0.5rem;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
     font-size: 0.9rem;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+    background-color: white;
 }
 
 .campsite-item:hover {
     background-color: var(--background-color);
+    border-color: var(--primary-color);
+}
+
+.campsite-item.selected {
+    background-color: rgba(26, 92, 76, 0.06);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(26, 92, 76, 0.1);
+}
+
+.campsite-item.selected .campsite-name {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.campsite-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.campsite-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.campsite-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.click-note {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    flex: 1;
+}
+
+.select-all-btn {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.select-all-btn:hover {
+    background-color: var(--border-color);
+    border-color: var(--text-muted);
 }
 
 .campsite-info {
     flex: 1;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
+}
+
+.campsite-info .campsite-name {
+    flex: 1;
 }
 
 .campsite-map {
     width: 100px;
     height: 100px;
-    border-radius: 4px;
+    border-radius: var(--radius);
     cursor: pointer;
     transition: opacity 0.2s;
 }
@@ -439,7 +1018,7 @@ input[list]::-webkit-calendar-picker-indicator {
     width: 100%;
     margin-bottom: 1rem;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--radius);
     overflow: hidden;
     height: 300px;
 }
@@ -448,7 +1027,7 @@ input[list]::-webkit-calendar-picker-indicator {
     width: 100%;
     height: auto;
     display: block;
-    border-radius: 4px;
+    border-radius: var(--radius);
     transition: opacity 0.2s;
 }
 
@@ -461,11 +1040,11 @@ input[list]::-webkit-calendar-picker-indicator {
         flex-direction: row;
         gap: 1rem;
     }
-    
+
     .campsite-results {
         flex: 1;
     }
-    
+
     .area-map {
         width: 400px;
         height: 100%;
@@ -473,4 +1052,2661 @@ input[list]::-webkit-calendar-picker-indicator {
         position: sticky;
         top: 1rem;
     }
-} 
+}
+
+/* Multi-campground results */
+.campground-results {
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    background-color: var(--background-color);
+    border-radius: var(--radius-lg);
+}
+
+.campground-results .campground-name {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.campground-results .results-section {
+    margin-top: 1rem;
+}
+
+.campground-results .results-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.no-results-small {
+    padding: 0.75rem;
+    background-color: var(--background-color);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   Calendar Grid — Alpine Dusk Colors
+   ======================================== */
+
+.calendar-legend {
+    display: flex;
+    gap: 1.25rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.legend-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+.legend-swatch.priority   { background-color: #C6E9D4; border: 1px solid var(--success-color); }
+.legend-swatch.regular    { background-color: #FDE8C8; border: 1px solid var(--secondary-color); }
+.legend-swatch.ignored    { background-color: #DBEAFE; border: 1px solid #93B4D4; }
+.legend-swatch.unavailable { background-color: #F3F1EE; border: 1px solid #D5D0C9; }
+
+.calendar-comparison {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.calendar-grid {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.cal-header {
+    margin-bottom: 0.75rem;
+}
+
+.cal-header a {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.cal-header a:hover {
+    text-decoration: underline;
+}
+
+.cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.cal-nav-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    width: 32px;
+    height: 32px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.cal-nav-btn:hover:not(:disabled) {
+    background: var(--background-color);
+    border-color: var(--primary-color);
+}
+
+.cal-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.cal-month-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.cal-dow-row {
+    margin-bottom: 2px;
+}
+
+.cal-dow {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    padding: 0.25rem 0;
+}
+
+.cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.cal-day {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    min-height: 32px;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.cal-day.blank {
+    background: transparent;
+}
+
+.cal-day.unavailable {
+    background-color: #F3F1EE;
+    color: #A8A29E;
+}
+
+.cal-day.out-of-range {
+    background-color: transparent;
+    color: #D5D0C9;
+}
+
+.cal-day.available {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.cal-day.available:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(45, 42, 38, 0.18);
+    z-index: 2;
+}
+
+.cal-day.available.priority {
+    background-color: #C6E9D4;
+    border: 1px solid var(--success-color);
+    color: #1B4D36;
+}
+
+.cal-day.available.regular {
+    background-color: #FDE8C8;
+    border: 1px solid var(--secondary-color);
+    color: #7A4B06;
+}
+
+.cal-day.available.ignored {
+    background-color: #DBEAFE;
+    border: 1px solid #93B4D4;
+    color: #1E40AF;
+}
+
+.cal-date {
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+.cal-count {
+    font-size: 0.65rem;
+    line-height: 1;
+    margin-top: 2px;
+    opacity: 0.8;
+}
+
+/* Mobile calendar */
+@media (max-width: 480px) {
+    .calendar-grid {
+        padding: 0.75rem;
+    }
+
+    .cal-day {
+        min-height: 28px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+    }
+
+    .cal-count {
+        font-size: 0.55rem;
+    }
+
+    .cal-header a {
+        font-size: 1rem;
+    }
+
+    .calendar-legend {
+        gap: 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================
+   Availability Summary Panel
+   ======================================== */
+
+.availability-summary {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+
+.avail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.avail-count {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.avail-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s;
+}
+
+.avail-toggle:hover {
+    background: white;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.avail-body {
+    padding: 0.5rem 1rem 1rem;
+}
+
+.avail-group {
+    margin-bottom: 0.75rem;
+}
+
+.avail-group:last-child {
+    margin-bottom: 0;
+}
+
+.avail-group-title {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    margin-bottom: 0.35rem;
+    text-decoration: none;
+}
+
+.avail-group-title:hover {
+    text-decoration: underline;
+}
+
+.avail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: background-color 0.15s;
+}
+
+.avail-row:hover {
+    background-color: var(--background-color);
+}
+
+.avail-checkin {
+    min-width: 110px;
+}
+
+.avail-checkin small {
+    color: var(--text-muted);
+}
+
+.avail-arrow {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.avail-checkout {
+    min-width: 90px;
+}
+
+.avail-sites {
+    font-weight: 600;
+    font-size: 0.78rem;
+    min-width: 50px;
+}
+
+.avail-badge {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.avail-badge.priority {
+    background-color: #C6E9D4;
+    color: #1B4D36;
+    border: 1px solid var(--success-color);
+}
+
+.avail-badge.regular {
+    background-color: #FDE8C8;
+    color: #7A4B06;
+    border: 1px solid var(--secondary-color);
+}
+
+.avail-badge.ignored {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+    border: 1px solid #93B4D4;
+}
+
+@media (max-width: 480px) {
+    .avail-row {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+    }
+
+    .avail-checkin,
+    .avail-checkout {
+        min-width: auto;
+    }
+}
+
+/* ========================================
+   Results Summary Bar
+   ======================================== */
+
+.results-summary-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+
+.summary-campground-section {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.summary-campground-section:last-of-type {
+    border-bottom: none;
+}
+
+.summary-campground-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    cursor: default;
+}
+
+.summary-campground-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.summary-campground-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+    word-wrap: break-word;
+}
+
+.summary-counts {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.summary-row-total {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-left: 0.15rem;
+}
+
+.summary-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.summary-chip.priority {
+    background-color: #C6E9D4;
+    color: #1B4D36;
+    border: 1px solid var(--success-color);
+}
+
+.summary-chip.regular {
+    background-color: #FDE8C8;
+    color: #7A4B06;
+    border: 1px solid var(--secondary-color);
+}
+
+.summary-chip.ignored {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+    border: 1px solid #93B4D4;
+}
+
+.summary-expand-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.summary-expand-btn:hover {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+.summary-detail-body {
+    padding: 0 1rem 0.75rem;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+}
+
+.summary-detail-body .avail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.5rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: inherit;
+    font-size: 0.82rem;
+    transition: background 0.15s;
+}
+
+.summary-detail-body .avail-row:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.summary-detail-body .avail-checkin {
+    font-weight: 500;
+    min-width: 110px;
+}
+
+.summary-detail-body .avail-arrow {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.summary-detail-body .avail-checkout {
+    min-width: 90px;
+}
+
+.summary-detail-body .avail-sites {
+    color: var(--success-color);
+    font-weight: 600;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.summary-detail-body .avail-badge {
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.summary-detail-body .avail-badge.priority {
+    background-color: #C6E9D4;
+    color: #1B4D36;
+}
+
+.summary-detail-body .avail-badge.regular {
+    background-color: #FDE8C8;
+    color: #7A4B06;
+}
+
+.summary-detail-body .avail-badge.ignored {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+}
+
+.avail-booking-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.78rem;
+    color: #2563EB;
+    text-decoration: none;
+}
+
+.avail-booking-link:hover {
+    text-decoration: underline;
+}
+
+.avail-booking-link i {
+    font-size: 0.65rem;
+}
+
+.summary-overall {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.55rem 1rem;
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-color);
+}
+
+.summary-total {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+@media (max-width: 480px) {
+    .summary-campground-row {
+        padding: 0.6rem 0.75rem;
+    }
+
+    .summary-chip {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.45rem;
+    }
+
+    .summary-detail-body .avail-row {
+        flex-wrap: wrap;
+        font-size: 0.78rem;
+    }
+
+    .summary-overall {
+        padding: 0.45rem 0.75rem;
+    }
+}
+
+/* ========================================
+   Watch This Search
+   ======================================== */
+
+.watch-search-section {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.watch-search-msg {
+    margin-bottom: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.watch-search-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.5rem;
+    background: var(--gradient-secondary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.watch-search-btn:hover:not(:disabled) {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.watch-search-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+.watch-search-btn.coming-soon {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    opacity: 0.85;
+}
+
+.watch-search-btn.watching {
+    background: var(--success-color);
+}
+
+.coming-soon-badge {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    color: #fff;
+    padding: 0.2rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+/* ========================================
+   Page-Scoped Backgrounds
+   ======================================== */
+
+/* Homepage hero background */
+.page-index {
+    background: var(--gradient-hero),
+        url("https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=2070&auto=format&fit=crop");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: white;
+}
+
+.page-index nav {
+    background-color: rgba(255, 255, 255, 0.95);
+    color: var(--text-color);
+}
+
+/* History page background */
+.page-history {
+    background: linear-gradient(
+            rgba(45, 42, 38, 0.55),
+            rgba(45, 42, 38, 0.35)
+        ),
+        url("https://images.unsplash.com/photo-1579522655346-0a77b6fd1ea2?q=80&w=2070&auto=format&fit=crop");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: white;
+}
+
+/* About page background */
+.page-about {
+    background: linear-gradient(
+            rgba(247, 245, 242, 0.92),
+            rgba(247, 245, 242, 0.92)
+        ),
+        url("https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=2070&auto=format&fit=crop");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* ========================================
+   Hero Section (Homepage)
+   ======================================== */
+
+.hero-section {
+    text-align: center;
+    padding: 60px 0 30px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 16px 16px 10px;
+        margin-bottom: 4px;
+    }
+}
+
+.hero-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.75rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.02em;
+    color: #fff;
+}
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    margin-bottom: 28px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+/* ========================================
+   Index Page — Form Overrides
+   ======================================== */
+
+.page-index .loading-spinner {
+    display: none;
+    text-align: center;
+    margin: var(--space-8) 0;
+    padding: var(--space-8);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.page-index .loading-spinner i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    animation: spin 1s linear infinite;
+    display: block;
+    margin-bottom: var(--space-4);
+}
+
+.loading-message {
+    font-size: 1.25rem;
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.loading-submessage {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+}
+
+.loading-tip {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.page-index .form-group:not(.city-search-group) {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
+.page-index .form-group.show {
+    display: block;
+    opacity: 1;
+}
+
+.page-index .search-button {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
+.page-index .search-button.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Dark frosted-glass search container */
+.page-index .search-container {
+    background: rgba(20, 30, 26, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    margin: 0 auto;
+    max-width: 700px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.page-index .search-with-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.page-index .search-with-button input {
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+.page-index .search-with-button input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.page-index .search-with-button input:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.16);
+}
+
+.page-index .search-city-button {
+    background: var(--gradient-secondary);
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-index .search-city-button:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 4px 12px rgba(212, 135, 14, 0.4);
+}
+
+.page-index .form-group {
+    margin-bottom: 16px;
+}
+
+.page-index .form-group:not(.city-search-group).show {
+    display: block;
+}
+
+.page-index .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 0;
+}
+
+.page-index .form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.page-index .form-group label {
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.page-index .form-group input[type="text"],
+.page-index .form-group input[type="date"],
+.page-index .form-group input[type="number"] {
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    width: 100%;
+    transition: all 0.2s;
+}
+
+.page-index .form-group input:focus {
+    border-color: rgba(255, 255, 255, 0.45);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Date picker icon color fix for dark bg */
+.page-index input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+/* Legacy radio-group styles (kept for non-index pages) */
+.page-index .radio-group label {
+    display: inline;
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.page-index .search-button {
+    background: var(--gradient-secondary);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 14px 36px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: block;
+    margin: 20px auto 0;
+    transition: all 0.2s ease;
+    width: auto;
+    box-shadow: 0 4px 16px rgba(212, 135, 14, 0.3);
+}
+
+.page-index .search-button:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(212, 135, 14, 0.45);
+    transform: translateY(-2px);
+}
+
+.page-index .results-section {
+    background-color: white;
+    color: var(--text-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin: 20px auto;
+    max-width: 700px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+}
+
+/* Campground Selection Display */
+.selected-campground {
+    margin-bottom: 16px;
+}
+
+.campground-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.campground-display i {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+}
+
+.campground-display span {
+    flex: 1;
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.change-campground-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius);
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.change-campground-btn:hover {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+/* Campsite list on dark glass background */
+.page-index .campsite-list {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    box-shadow: none;
+}
+
+.page-index .campsite-list h3 {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.page-index .campsite-item {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.page-index .campsite-item:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.page-index .campsite-item.selected {
+    background-color: rgba(26, 92, 76, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+
+.page-index .campsite-item.selected .campsite-name {
+    color: #fff;
+}
+
+.page-index .campsite-name {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.page-index .campsite-id {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.page-index .campsite-header h3 {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.page-index .click-note {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.page-index .select-all-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.page-index .select-all-btn:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Mobile Responsive for index */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 1.3rem;
+        margin-bottom: 4px;
+    }
+
+    .hero-subtitle {
+        font-size: 0.8rem;
+        margin-bottom: 0;
+    }
+
+    .page-index .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .page-index .search-container .search-with-button {
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .page-index .search-container .search-with-button input {
+        margin-bottom: 12px;
+    }
+
+    .page-index .search-container .search-city-button {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .map-search-bar .search-with-button {
+        flex-direction: row !important;
+    }
+
+    .map-search-bar .search-with-button input {
+        margin-bottom: 0 !important;
+    }
+
+    .map-search-bar .search-city-button {
+        width: 44px !important;
+        min-width: 44px;
+    }
+
+    .campground-display {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .change-campground-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ========================================
+   History Page Styles
+   ======================================== */
+
+.history-container {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.92);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow);
+    margin: var(--space-8) 0;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+/* Section headers */
+.section-header {
+    margin-bottom: var(--space-4);
+}
+
+.section-header h2 {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h2 i {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.section-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* ---- Watches Section ---- */
+
+.watches-section {
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.watches-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.watch-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    transition: all 0.15s;
+}
+
+.watch-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.watch-item.inactive {
+    opacity: 0.55;
+}
+
+.watch-status {
+    flex-shrink: 0;
+}
+
+.status-dot {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-dot.active {
+    background: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(46, 125, 91, 0.15);
+}
+
+.status-dot.paused {
+    background: var(--text-muted);
+}
+
+.watch-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.watch-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.watch-details {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.watch-provider {
+    color: #2563EB;
+    font-weight: 600;
+}
+
+.watch-checked {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-style: italic;
+}
+
+.watch-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.watch-toggle-btn,
+.watch-delete-btn {
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: all 0.15s;
+}
+
+.watch-toggle-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.watch-delete-btn:hover {
+    background: var(--error-color);
+    color: white;
+    border-color: var(--error-color);
+}
+
+.watches-empty {
+    padding: 16px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* ---- History List (compact one-liners) ---- */
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.12s;
+}
+
+.history-row:last-child {
+    border-bottom: none;
+}
+
+.history-row:hover {
+    background: var(--background-color);
+}
+
+.history-row-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-name {
+    display: block;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-meta {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+
+.history-row-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.history-date-ago {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.history-row-right i {
+    color: var(--text-muted);
+    font-size: 0.65rem;
+}
+
+.empty-history {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--text-muted);
+}
+
+.empty-history i {
+    font-size: 2rem;
+    margin-bottom: var(--space-3);
+    opacity: 0.5;
+    display: block;
+}
+
+.empty-history a {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Legacy buttons kept for other pages */
+.search-again-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.search-again-btn:hover {
+    filter: brightness(1.05);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.view-site-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--gradient-secondary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.view-site-btn:hover {
+    filter: brightness(1.05);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+@media (max-width: 600px) {
+    .watch-item {
+        padding: 10px 12px;
+    }
+
+    .watch-name {
+        font-size: 0.82rem;
+    }
+
+    .watch-details {
+        font-size: 0.72rem;
+    }
+
+    .history-container {
+        padding: var(--space-4);
+    }
+}
+
+/* ========================================
+   About Page Styles
+   ======================================== */
+
+.about-container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin: var(--space-8) auto;
+}
+
+.about-container h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+}
+
+.about-lead {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.about-container h2 {
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.about-container p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.about-tiers {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.about-tier {
+    flex: 1;
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    background: var(--background-color);
+}
+
+.about-tier h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.about-tier ul {
+    list-style: none;
+    padding: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.about-tier ul li {
+    padding: 3px 0;
+}
+
+.about-tier ul li::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: var(--success-color);
+    margin-right: 6px;
+    font-size: 0.7rem;
+}
+
+.about-disclaimer {
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 600px) {
+    .about-tiers {
+        flex-direction: column;
+    }
+}
+
+.feature-list {
+    margin: 1.5rem 0;
+    padding-left: 1.2rem;
+}
+
+.feature-list li {
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   Social Login (Google button in auth pages)
+   ======================================== */
+
+.social-login {
+    margin-bottom: var(--space-4);
+}
+
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    font-weight: 500;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.google-btn:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+}
+
+.google-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: var(--space-6) 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.divider span {
+    padding: 0 var(--space-4);
+}
+
+/* ========================================
+   Homepage Map Section
+   ======================================== */
+
+/* ========================================
+   Map + List Container (side-by-side on desktop)
+   ======================================== */
+
+/* Search bar above map */
+.map-search-bar {
+    max-width: 600px;
+    margin: var(--space-6) auto var(--space-4);
+    padding: 0 var(--space-4);
+}
+
+.map-search-bar .search-with-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.map-search-bar .search-with-button input {
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-size: 1rem;
+    padding: 12px 18px;
+    border-radius: var(--radius-full);
+    transition: all 0.2s ease;
+}
+
+.map-search-bar .search-with-button input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.map-search-bar .search-with-button input:focus {
+    border-color: rgba(255, 255, 255, 0.55);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.map-search-bar .search-city-button {
+    background: var(--gradient-secondary);
+    border: none;
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-search-bar .search-city-button:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 4px 12px rgba(212, 135, 14, 0.4);
+}
+
+@media (max-width: 768px) {
+    .map-search-bar {
+        padding: 0 var(--space-2);
+        margin-bottom: 8px;
+    }
+}
+
+.map-list-container {
+    display: flex;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto var(--space-6);
+    padding: 0 var(--space-4);
+}
+
+.homepage-map-section {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.homepage-map {
+    width: 100%;
+    height: 500px;
+}
+
+.campsite-list-panel {
+    width: 380px;
+    max-height: 500px;
+    overflow-y: auto;
+    background: rgba(30, 28, 24, 0.85);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-md);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+.campsite-list-panel::-webkit-scrollbar {
+    width: 6px;
+}
+.campsite-list-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+.campsite-list-panel::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
+
+.campsite-list-panel .campsite-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: rgba(30, 28, 24, 0.95);
+}
+
+.list-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: rgba(255,255,255,0.8);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    z-index: 6;
+}
+
+.list-close-btn:hover {
+    background: rgba(255,255,255,0.3);
+    color: #fff;
+}
+
+.campsite-list-panel .campsite-header h3 {
+    font-size: 0.95rem;
+    color: #fff;
+    margin: 0 0 4px;
+}
+
+.campsite-list-panel .campsite-count {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.6);
+    display: block;
+    margin-bottom: 6px;
+}
+
+.campsite-list-panel .click-note {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.campsite-list-panel .select-all-btn {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.campsite-list-panel .select-all-btn:hover {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+}
+
+.campsite-list-panel .campsite-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.campsite-list-panel .campsite-item:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+.campsite-list-panel .campsite-item.selected {
+    background: rgba(26, 92, 76, 0.25);
+    border-left: 3px solid var(--primary-color);
+}
+
+.campsite-list-panel .campsite-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.campsite-list-panel .campsite-info .campsite-name {
+    flex: 1;
+    color: rgba(255,255,255,0.9);
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.campsite-list-panel .campsite-checkbox {
+    flex-shrink: 0;
+    accent-color: var(--primary-color);
+}
+
+.no-results-msg {
+    padding: 20px 16px;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* Map floating selection badge */
+.map-selection-badge {
+    display: none; /* shown via JS on both desktop and mobile */
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: var(--primary-color);
+    color: white;
+    border-radius: var(--radius-full);
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.map-view-list-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.map-view-list-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Mobile: stack vertically */
+@media (max-width: 768px) {
+    .map-list-container {
+        flex-direction: column;
+        padding: 0 var(--space-2);
+        margin-bottom: 8px;
+    }
+
+    .homepage-map {
+        height: 65vh;
+        min-height: 350px;
+    }
+
+    .campsite-list-panel {
+        width: 100%;
+        max-height: 300px;
+        display: none; /* hidden by default on mobile; shown via "View List" */
+    }
+
+    .campsite-list-panel.mobile-expanded {
+        display: block !important;
+    }
+}
+
+.search-area-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: white;
+    color: var(--text-color);
+    border: none;
+    border-radius: var(--radius-full);
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+.search-area-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 16px rgba(26, 92, 76, 0.35);
+}
+
+/* ========================================
+   Preference Pill Toggles
+   ======================================== */
+
+.preference-pills {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.preference-pill {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 10px 18px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    /* Override generic label styles */
+    margin-bottom: 0;
+    font-size: inherit;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--text-color);
+}
+
+.preference-pill input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.preference-pill i {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.pill-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    display: inline;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.pill-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: inline;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.preference-pill:hover {
+    border-color: var(--primary-color);
+    background: rgba(26, 92, 76, 0.04);
+}
+
+.preference-pill.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.preference-pill.active i,
+.preference-pill.active .pill-label,
+.preference-pill.active .pill-subtitle {
+    color: white;
+}
+
+.preference-pill.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Index page — pills on dark bg */
+.page-index .preference-pills {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius);
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.page-index .preference-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.page-index .preference-pill i,
+.page-index .pill-label,
+.page-index .pill-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.page-index .preference-pill:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.page-index .preference-pill.active {
+    background: var(--primary-color);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 12px rgba(26, 92, 76, 0.4);
+}
+
+.page-index .preference-pill.active i,
+.page-index .preference-pill.active .pill-label,
+.page-index .preference-pill.active .pill-subtitle {
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .preference-pills {
+        flex-direction: column;
+    }
+
+    .preference-pill {
+        min-width: unset;
+    }
+}
+
+/* ========================================
+   Facility Type Badges (Campground / Cabin)
+   ======================================== */
+
+.facility-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.facility-type-badge.campground {
+    background-color: rgba(26, 92, 76, 0.12);
+    color: #1A5C4C;
+    border: 1px solid rgba(26, 92, 76, 0.25);
+}
+
+.facility-type-badge.cabin {
+    background-color: rgba(212, 135, 14, 0.12);
+    color: #D4870E;
+    border: 1px solid rgba(212, 135, 14, 0.25);
+}
+
+.facility-type-badge.rc {
+    background-color: rgba(37, 99, 235, 0.12);
+    color: #2563EB;
+    border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+/* On dark bg */
+.page-index .facility-type-badge.campground {
+    background-color: rgba(26, 92, 76, 0.35);
+    color: #A8E6CF;
+    border-color: rgba(26, 92, 76, 0.5);
+}
+
+.page-index .facility-type-badge.cabin {
+    background-color: rgba(212, 135, 14, 0.3);
+    color: #FDDCAA;
+    border-color: rgba(212, 135, 14, 0.5);
+}
+
+.page-index .facility-type-badge.rc {
+    background-color: rgba(37, 99, 235, 0.3);
+    color: #93C5FD;
+    border-color: rgba(37, 99, 235, 0.5);
+}
+
+/* ========================================
+   InfoWindow (Map Popup)
+   ======================================== */
+
+.iw-content {
+    max-width: 300px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.iw-image {
+    margin: -8px -8px 0 -8px;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    max-height: 160px;
+}
+
+.iw-image img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+}
+
+.iw-body {
+    padding: 10px 4px 4px;
+}
+
+.iw-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.iw-name {
+    font-size: 14px;
+    line-height: 1.3;
+    color: #1a1a1a;
+}
+
+.iw-desc {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: #6B6560;
+    line-height: 1.4;
+}
+
+.iw-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.infowindow-select-btn {
+    background: linear-gradient(135deg, #1A5C4C, #237A66);
+    color: #fff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.infowindow-select-btn:hover {
+    background: linear-gradient(135deg, #237A66, #2B9A82);
+}
+
+.iw-booking-link {
+    font-size: 11px;
+    color: #2563EB;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.iw-booking-link:hover {
+    text-decoration: underline;
+}
+
+.iw-booking-link i {
+    font-size: 9px;
+}
+
+/* Multi-campground InfoWindow */
+.iw-multi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.iw-multi-header strong {
+    font-size: 13px;
+    color: #1a1a1a;
+}
+
+.iw-select-all-btn {
+    background: linear-gradient(135deg, #1A5C4C, #237A66);
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.iw-select-all-btn:hover {
+    background: linear-gradient(135deg, #237A66, #2B9A82);
+}
+
+.iw-multi-site {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.iw-multi-site:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.iw-multi-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.iw-multi-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.iw-multi-info .iw-name {
+    font-size: 13px;
+}
+
+.iw-multi-site .infowindow-select-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.iw-multi-site .iw-booking-link {
+    font-size: 10px;
+    margin-left: 2px;
+}
+
+/* ========================================
+   Numbered Markers in List
+   ======================================== */
+
+.campsite-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ========================================
+   Flash Highlight (map → list sync)
+   ======================================== */
+
+@keyframes flashHighlight {
+    0% { background-color: rgba(212, 135, 14, 0.3); }
+    100% { background-color: transparent; }
+}
+
+.campsite-item.flash-highlight {
+    animation: flashHighlight 1.2s ease-out forwards;
+}
+
+/* ========================================
+   Map Layer (full viewport on mobile)
+   ======================================== */
+
+.map-layer {
+    position: relative;
+}
+
+/* ========================================
+   Bottom Sheet
+   ======================================== */
+
+.bottom-sheet {
+    position: relative;
+    z-index: 50;
+}
+
+.bottom-sheet-handle {
+    display: none; /* hidden on desktop */
+}
+
+.bottom-sheet-content {
+    /* on desktop, just flows normally */
+}
+
+/* ========================================
+   Mobile: Google Maps-like layout
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Make body not scroll — map is the page */
+    .page-index {
+        overflow: hidden;
+        height: 100vh;
+        height: 100dvh;
+        padding-bottom: 0;
+        background-attachment: scroll; /* fixed bg breaks on mobile */
+    }
+
+    .page-index main {
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+        height: calc(100vh - 48px);
+        height: calc(100dvh - 48px);
+        position: relative;
+        overflow: hidden;
+        animation: none;
+    }
+
+    /* Map fills the viewport behind everything */
+    .page-index .map-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+
+    .page-index .map-list-container {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    .page-index .homepage-map-section {
+        height: 100%;
+        border-radius: 0;
+        overflow: hidden;
+    }
+
+    .page-index .homepage-map {
+        height: 100% !important;
+        min-height: unset;
+    }
+
+    /* Floating search bar on top of map */
+    .page-index .map-search-bar {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        z-index: 20;
+        margin: 0;
+        padding: 0;
+        max-width: 100%;
+    }
+
+    .page-index .map-search-bar .search-with-button {
+        background: white;
+        border-radius: var(--radius-full);
+        padding: 4px 4px 4px 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .page-index .map-search-bar .search-with-button input {
+        background: transparent;
+        border: none;
+        color: var(--text-color);
+        font-size: 0.95rem;
+        padding: 8px 4px;
+        border-radius: 0;
+    }
+
+    .page-index .map-search-bar .search-with-button input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .page-index .map-search-bar .search-with-button input:focus {
+        box-shadow: none;
+        border: none;
+        outline: none;
+        background: transparent;
+    }
+
+    .page-index .map-search-bar .search-city-button {
+        width: 36px !important;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 50%;
+        font-size: 1rem;
+    }
+
+    /* "Search this area" button position */
+    .page-index .search-area-btn {
+        top: 64px;
+    }
+
+    /* Selection badge above bottom sheet */
+    .page-index .map-selection-badge {
+        bottom: 70px;
+    }
+
+    /* Campsite list panel as overlay */
+    .page-index .campsite-list-panel {
+        position: absolute;
+        top: 60px;
+        left: 8px;
+        right: 8px;
+        z-index: 25;
+        max-height: calc(100% - 140px);
+        border-radius: var(--radius-lg);
+        width: auto;
+    }
+
+    /* Bottom sheet: fixed at bottom */
+    .page-index .bottom-sheet {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 30;
+        background: white;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        max-height: calc(100vh - 44px);
+        max-height: calc(100dvh - 44px);
+        will-change: transform;
+        /* Start in peek state via JS */
+    }
+
+    .page-index .bottom-sheet-handle {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 16px 8px;
+        cursor: grab;
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: none;
+    }
+
+    .page-index .handle-bar {
+        width: 36px;
+        height: 4px;
+        background: #D5D0C9;
+        border-radius: 2px;
+        margin-bottom: 6px;
+    }
+
+    .page-index .bottom-sheet-peek {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .page-index .bottom-sheet-peek i {
+        font-size: 0.7rem;
+    }
+
+    .page-index .bottom-sheet-content {
+        padding: 0 16px 24px;
+        overflow-y: hidden;
+        max-height: calc(100vh - 100px);
+        max-height: calc(100dvh - 100px);
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Override search container styles for bottom sheet */
+    .page-index .bottom-sheet .search-container {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+        box-shadow: none;
+        border: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    /* Fix form inputs for light bg in bottom sheet */
+    .page-index .bottom-sheet .form-group label {
+        color: var(--text-muted);
+    }
+
+    .page-index .bottom-sheet .form-group input[type="text"],
+    .page-index .bottom-sheet .form-group input[type="date"],
+    .page-index .bottom-sheet .form-group input[type="number"] {
+        background-color: var(--background-color);
+        border: 2px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+    .page-index .bottom-sheet .form-group input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 92, 76, 0.15);
+        background-color: white;
+    }
+
+    .page-index .bottom-sheet input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: none;
+    }
+
+    /* Preference pills: light theme in bottom sheet */
+    .page-index .bottom-sheet .preference-pills {
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    .page-index .bottom-sheet .preference-pill {
+        background: var(--background-color);
+        border-color: var(--border-color);
+    }
+
+    .page-index .bottom-sheet .preference-pill i,
+    .page-index .bottom-sheet .pill-label,
+    .page-index .bottom-sheet .pill-subtitle {
+        color: var(--text-color);
+    }
+
+    .page-index .bottom-sheet .preference-pill.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .page-index .bottom-sheet .preference-pill.active i,
+    .page-index .bottom-sheet .preference-pill.active .pill-label,
+    .page-index .bottom-sheet .preference-pill.active .pill-subtitle {
+        color: white;
+    }
+
+    /* Selected campground display - light theme */
+    .page-index .bottom-sheet .campground-display {
+        background-color: rgba(26, 92, 76, 0.06);
+        border: 2px solid var(--primary-color);
+    }
+
+    .page-index .bottom-sheet .campground-display i {
+        color: var(--primary-color);
+    }
+
+    .page-index .bottom-sheet .campground-display span {
+        color: var(--text-color);
+    }
+
+    .page-index .bottom-sheet .change-campground-btn {
+        background: var(--background-color);
+        color: var(--text-color);
+        border-color: var(--border-color);
+    }
+
+    /* Search button in bottom sheet */
+    .page-index .bottom-sheet .search-button {
+        background: var(--gradient-secondary);
+        width: 100%;
+        margin-top: 12px;
+    }
+
+    /* Loading spinner in bottom sheet */
+    .page-index .bottom-sheet .loading-spinner {
+        margin: var(--space-4) 0;
+        padding: var(--space-4);
+    }
+
+    /* Results in bottom sheet */
+    .page-index .bottom-sheet .results-container {
+        margin-top: var(--space-4);
+    }
+
+    /* Preference pills horizontal on mobile in bottom sheet */
+    .page-index .bottom-sheet .preference-pills {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .page-index .bottom-sheet .preference-pill {
+        min-width: unset;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+}

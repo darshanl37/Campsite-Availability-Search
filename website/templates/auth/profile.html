@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile - Campsite Availability Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/">
+                    <i class="fas fa-campground"></i>
+                    <span>CampFinder</span>
+                </a>
+            </div>
+            <div class="nav-center">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/history" class="nav-link">History</a>
+                <a href="/about" class="nav-link">About</a>
+            </div>
+            <div class="nav-right">
+                <a href="{{ url_for('auth.profile') }}" class="nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="profile-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="profile-header">
+                {% if user.profile_picture %}
+                <div class="profile-picture">
+                    <img src="{{ user.profile_picture }}" alt="{{ user.name }}'s profile picture">
+                </div>
+                {% endif %}
+                <h1 class="profile-name">{{ user.name }}</h1>
+                <div class="profile-email">{{ user.email }}</div>
+                {% if user.language_preference %}
+                <div class="profile-language">Preferred language: {{ user.language_preference }}</div>
+                {% endif %}
+
+                {% if user.paid_tier %}
+                    <div class="subscription-status paid">
+                        Lifetime Member
+                    </div>
+                {% else %}
+                    <div class="subscription-status">
+                        Free Tier ({{ user.free_notifications_used }}/5 notifications used)
+                        <a href="{{ url_for('payment.index') }}" class="upgrade-link">Upgrade</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-section">
+                <h2>Notification Preferences</h2>
+                <p>Choose how you want to receive notifications about campsite availability.</p>
+
+                <form method="POST" action="{{ url_for('auth.profile') }}">
+                    <div class="notification-settings">
+                        {% set preferences = user.notification_preferences|tojson|safe|from_json %}
+
+                        <div class="notification-option">
+                            <input type="checkbox" id="email" name="email" {% if preferences.email %}checked{% endif %}>
+                            <label for="email">Email ({{ user.email }})</label>
+                        </div>
+
+                        <div class="notification-option">
+                            <input type="checkbox" id="sms" name="sms" {% if preferences.sms %}checked{% endif %}>
+                            <label for="sms">
+                                SMS
+                                {% if user.phone %}
+                                    ({{ user.phone }})
+                                    {% if user.phone_verified %}
+                                        <span class="verification-status verified">Verified</span>
+                                    {% else %}
+                                        <span class="verification-status unverified">Unverified</span>
+                                        <a href="{{ url_for('auth.verify', type='sms') }}" class="verify-button">Verify</a>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{{ url_for('auth.verify', type='sms') }}" class="verify-button">Add Phone</a>
+                                {% endif %}
+                            </label>
+                        </div>
+
+                        <div class="notification-option">
+                            <input type="checkbox" id="whatsapp" name="whatsapp" {% if preferences.whatsapp %}checked{% endif %}>
+                            <label for="whatsapp">
+                                WhatsApp
+                                {% if user.whatsapp %}
+                                    ({{ user.whatsapp }})
+                                    {% if user.whatsapp_verified %}
+                                        <span class="verification-status verified">Verified</span>
+                                    {% else %}
+                                        <span class="verification-status unverified">Unverified</span>
+                                        <a href="{{ url_for('auth.verify', type='whatsapp') }}" class="verify-button">Verify</a>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{{ url_for('auth.verify', type='whatsapp') }}" class="verify-button">Add WhatsApp</a>
+                                {% endif %}
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="auth-button">Save Preferences</button>
+                </form>
+            </div>
+
+            <div class="profile-section">
+                <h2>Your Subscriptions</h2>
+                <p>Manage your campsite availability notifications.</p>
+
+                <a href="{{ url_for('subscription.index') }}" class="auth-button">Manage Subscriptions</a>
+            </div>
+
+            <div class="auth-links">
+                <a href="{{ url_for('auth.logout') }}">Log out</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

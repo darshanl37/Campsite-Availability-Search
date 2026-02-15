@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+camping_reservation_website_venv/
+Camping_Reservation_python_script/camping_reservation/
+
+# Database
+*.db
+instance/
+
+# Environment / secrets
+.env
+*.json
+!package.json
+.cloudflared/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+.claude/
+
+# Temp files
+tmp/
+*.pid
+screenshots/
+
+# Node
+node_modules/
+package-lock.json

@@ -1,0 +1,361 @@
+/* Payment Styles */
+
+/* Payment container */
+.payment-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.payment-container h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    font-size: 1.8rem;
+}
+
+/* Payment info card */
+.payment-info-card {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.current-plan,
+.upgrade-plan {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+}
+
+.current-plan h2,
+.upgrade-plan h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.plan-details {
+    margin-bottom: 1rem;
+}
+
+.plan-type {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--muted-foreground);
+}
+
+.plan-type.premium {
+    color: var(--primary-color);
+}
+
+.plan-usage {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: var(--muted-foreground);
+}
+
+.plan-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.plan-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plan-features li {
+    padding-left: 1.5rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--muted-foreground);
+}
+
+.plan-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--secondary-color);
+    font-weight: 700;
+}
+
+/* Payment Options */
+.payment-options {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.payment-options h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.payment-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.payment-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.payment-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.payment-button.secondary {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.payment-button.secondary:hover {
+    background-color: #ddd;
+}
+
+.payment-button img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.stripe-button {
+    background-color: #6772e5;
+}
+
+.stripe-button:hover {
+    background-color: #5469d4;
+}
+
+.venmo-button {
+    background-color: #3d95ce;
+}
+
+.venmo-button:hover {
+    background-color: #3085b8;
+}
+
+/* Pending Payment */
+.pending-payment {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.pending-payment h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.pending-payment p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--muted-foreground);
+}
+
+/* Venmo Confirmation */
+.venmo-confirmation {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.venmo-confirmation h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.venmo-instructions {
+    margin-bottom: 1.5rem;
+}
+
+.venmo-instructions p {
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.venmo-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.venmo-link {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.app-link {
+    background-color: #3d95ce;
+    color: white;
+}
+
+.app-link:hover {
+    background-color: #3085b8;
+}
+
+.web-link {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.web-link:hover {
+    background-color: #ddd;
+}
+
+.venmo-reference {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: var(--background-color);
+    border-radius: 4px;
+}
+
+.reference-id {
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.verification-section {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.verification-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.verification-section p {
+    margin-bottom: 1rem;
+}
+
+/* Payment Result Pages */
+.payment-result-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.payment-result-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.payment-result-container.success .payment-result-icon {
+    color: var(--secondary-color);
+}
+
+.payment-result-container.cancel .payment-result-icon {
+    color: #dc3545;
+}
+
+.payment-result-container h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.payment-result-message {
+    margin-bottom: 1.5rem;
+}
+
+.payment-result-message p {
+    margin-bottom: 0.5rem;
+}
+
+.payment-result-message ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    text-align: left;
+    display: inline-block;
+}
+
+.payment-result-message li {
+    padding-left: 1.5rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+.payment-result-message li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--secondary-color);
+    font-weight: 700;
+}
+
+.next-steps {
+    margin-top: 1.5rem;
+}
+
+.next-steps h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.next-steps-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .payment-info-card {
+        flex-direction: column;
+    }
+    
+    .payment-buttons {
+        flex-direction: column;
+    }
+} 
